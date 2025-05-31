@@ -33,10 +33,10 @@ const TOKENIZATION_MODELS: Record<string, string[]> = {
   ],
   anthropic: [
     // Claude 4 series
-    'claude-4-opus', 'claude-4-sonnet',
-    // Claude 3 series (using shorter aliases)
-    'claude-3.7-sonnet', 'claude-3.5-sonnet', 'claude-3.5-haiku', 
-    'claude-3-opus', 'claude-3-haiku'
+    'claude-opus-4-0', 'claude-sonnet-4-0',
+    // Claude 3 series (using Anthropic aliases)
+    'claude-3-7-sonnet-latest', 'claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest',
+    'claude-3-opus-latest',
   ],
   google: [
     // Gemini chat models

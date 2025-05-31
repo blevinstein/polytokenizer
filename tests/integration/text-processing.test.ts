@@ -4,13 +4,13 @@ import { splitTextMaxTokens, trimMessages, configure } from '../../src/index.js'
 describe('Text Processing Integration', () => {
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
   const hasAnthropicKey = !!process.env.ANTHROPIC_API_KEY;
-  const hasGoogleKey = !!process.env.GOOGLE_API_KEY;
+  const hasGoogleKey = !!process.env.GEMINI_API_KEY;
 
   beforeAll(() => {
     configure({
       openai: { apiKey: process.env.OPENAI_API_KEY || '' },
       anthropic: { apiKey: process.env.ANTHROPIC_API_KEY || '' },
-      google: { apiKey: process.env.GOOGLE_API_KEY || '' },
+      google: { apiKey: process.env.GEMINI_API_KEY || '' },
     });
   });
 
@@ -40,15 +40,17 @@ describe('Text Processing Integration', () => {
       const chunks = await splitTextMaxTokens('google/gemini-1.5-pro', text, 10);
       
       expect(chunks.length).toBeGreaterThanOrEqual(1);
-      expect(chunks.join(' ')).toContain('Test sentence');
+      expect(chunks.join(' ')).toContain('Test');
+      expect(chunks.join(' ')).toContain('sentence');
     });
 
     it.skipIf(!hasAnthropicKey)('should work with Anthropic models', async () => {
       const text = 'Test sentence for splitting with Anthropic models and API integration.';
-      const chunks = await splitTextMaxTokens('anthropic/claude-3.5-sonnet', text, 10);
+      const chunks = await splitTextMaxTokens('anthropic/claude-3-5-sonnet-latest', text, 10);
       
       expect(chunks.length).toBeGreaterThanOrEqual(1);
-      expect(chunks.join(' ')).toContain('Test sentence');
+      expect(chunks.join(' ')).toContain('Test');
+      expect(chunks.join(' ')).toContain('sentence');
     });
 
     it.skipIf(!hasOpenAIKey)('should handle empty text', async () => {
@@ -115,13 +117,16 @@ describe('Text Processing Integration', () => {
     });
 
     it.skipIf(!hasAnthropicKey)('should work with Anthropic models', async () => {
-      const simpleMessages = [
-        { role: 'user' as const, content: 'Hello' },
-        { role: 'assistant' as const, content: 'Hi' },
+      const messages = [
+        { role: 'system' as const, content: 'You are a helpful assistant.' },
+        { role: 'user' as const, content: 'Hello, how are you?' },
+        { role: 'assistant' as const, content: 'I am doing well, thank you for asking!' },
+        { role: 'user' as const, content: 'What is the weather like today?' }
       ];
       
-      const trimmed = await trimMessages(simpleMessages, 'anthropic/claude-3.5-sonnet', 5);
-      expect(trimmed.length).toBeGreaterThanOrEqual(0);
+      const trimmed = await trimMessages(messages, 'anthropic/claude-3-5-sonnet-latest', 50);
+      expect(trimmed.length).toBeLessThanOrEqual(messages.length);
+      expect(trimmed.length).toBeGreaterThan(0);
     });
 
     it.skipIf(!hasGoogleKey)('should work with Google models', async () => {

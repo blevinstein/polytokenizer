@@ -36,8 +36,8 @@ Integration tests automatically skip tests for providers where API keys are not 
 Create a `.env` file in the project root:
 ```bash
 OPENAI_API_KEY=sk-your-openai-api-key-here
-ANTHROPIC_API_KEY=sk-ant-your-anthropic-api-key-here\
-GOOGLE_API_KEY=your-google-ai-api-key-here
+ANTHROPIC_API_KEY=sk-ant-your-anthropic-api-key-here
+GEMINI_API_KEY=your-google-ai-api-key-here
 ```
 
 ## Running All Tests

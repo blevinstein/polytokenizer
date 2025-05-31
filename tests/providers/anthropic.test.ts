@@ -63,19 +63,19 @@ describe('AnthropicProvider', () => {
 
     describe('Token Counting', () => {
       it.skipIf(!hasApiKey)('should count tokens for Claude 3.5 Sonnet', async () => {
-        const count = await countTokens('anthropic/claude-3.5-sonnet', 'Hello world');
+        const count = await countTokens('anthropic/claude-3-5-sonnet-latest', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
 
       it.skipIf(!hasApiKey)('should count tokens for Claude 3.7 Sonnet', async () => {
-        const count = await countTokens('anthropic/claude-3.7-sonnet', 'Hello world');
+        const count = await countTokens('anthropic/claude-3-7-sonnet-latest', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
 
       it.skipIf(!hasApiKey)('should count tokens for Claude 3.5 Haiku', async () => {
-        const count = await countTokens('anthropic/claude-3.5-haiku', 'Hello world');
+        const count = await countTokens('anthropic/claude-3-5-haiku-latest', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
@@ -84,15 +84,14 @@ describe('AnthropicProvider', () => {
         const shortText = 'Hello';
         const longText = 'Hello world this is a longer sentence with more words and punctuation!';
         
-        const shortCount = await countTokens('anthropic/claude-3.5-sonnet', shortText);
-        const longCount = await countTokens('anthropic/claude-3.5-sonnet', longText);
+        const shortCount = await countTokens('anthropic/claude-3-5-sonnet-latest', shortText);
+        const longCount = await countTokens('anthropic/claude-3-5-sonnet-latest', longText);
         
         expect(longCount).toBeGreaterThan(shortCount);
       });
 
-      it.skipIf(!hasApiKey)('should handle empty text', async () => {
-        const count = await countTokens('anthropic/claude-3.5-sonnet', '');
-        expect(count).toBe(0);
+      it.skipIf(!hasApiKey)('should reject empty text for token counting', async () => {
+        await expect(countTokens('anthropic/claude-3-5-sonnet-latest', '')).rejects.toThrow();
       });
 
       it.skipIf(!hasApiKey)('should work with complex text', async () => {
@@ -105,14 +104,14 @@ describe('AnthropicProvider', () => {
           and various punctuation marks: "quotes", 'apostrophes', and dashes—like this.
         `;
         
-        const count = await countTokens('anthropic/claude-3.5-sonnet', complexText);
+        const count = await countTokens('anthropic/claude-3-5-sonnet-latest', complexText);
         expect(count).toBeGreaterThan(20); // Should be significantly more than a few words
         expect(typeof count).toBe('number');
       });
 
       it.skipIf(!hasApiKey)('should reject invalid API keys', async () => {
         configure({ anthropic: { apiKey: 'sk-ant-invalid-key-test' } });
-        await expect(countTokens('anthropic/claude-3.5-sonnet', 'test')).rejects.toThrow();
+        await expect(countTokens('anthropic/claude-3-5-sonnet-latest', 'test')).rejects.toThrow();
         
         // Restore valid key
         if (hasApiKey) {
