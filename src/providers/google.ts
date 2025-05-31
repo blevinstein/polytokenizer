@@ -17,12 +17,13 @@ export class GoogleProvider implements EmbeddingProvider {
   }
 
   async embed(text: string, model: string): Promise<EmbeddingResult> {
-    if (!this.supportedModels.includes(model)) {
+    const modelName = model.replace('google/', '');
+    if (!this.supportedModels.includes(modelName)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }
 
     try {
-      const embeddingModel = this.client.getGenerativeModel({ model });
+      const embeddingModel = this.client.getGenerativeModel({ model: modelName });
       const result = await embeddingModel.embedContent(text);
 
       if (!result.embedding || !result.embedding.values) {
@@ -31,7 +32,7 @@ export class GoogleProvider implements EmbeddingProvider {
 
       return {
         vector: result.embedding.values,
-        model,
+        model: modelName,
         usage: {
           tokens: this.estimateTokens(text),
         },
@@ -52,7 +53,8 @@ export class GoogleProvider implements EmbeddingProvider {
 
   async countTokens(model: string, text: string): Promise<number> {
     try {
-      const genModel = this.client.getGenerativeModel({ model });
+      const modelName = model.replace('google/', '');
+      const genModel = this.client.getGenerativeModel({ model: modelName });
       const result = await genModel.countTokens(text);
       return result.totalTokens;
     } catch (error: any) {

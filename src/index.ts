@@ -14,12 +14,34 @@ interface ProviderInstances {
 let config: LibraryConfig = {};
 let providers: ProviderInstances = {};
 
+const EMBEDDING_MODELS: Record<string, string[]> = {
+  openai: ['text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002'],
+  google: ['gemini-embedding-exp-03-07', 'text-embedding-004', 'embedding-001'],
+  anthropic: [] // Anthropic doesn't have public embedding API
+};
+
+// Models that support tokenization (both chat and embedding models)
+const TOKENIZATION_MODELS: Record<string, string[]> = {
+  openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'o1-preview', 'o1-mini', 'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002'],
+  anthropic: ['claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'],
+  google: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro', 'gemini-embedding-exp-03-07', 'text-embedding-004', 'embedding-001']
+};
+
 function parseModel(model: string): { provider: string; modelName: string } {
   const parts = model.split('/');
   if (parts.length < 2) {
     throw new Error(`Invalid model format: ${model}. Expected format: provider/model`);
   }
   return { provider: parts[0], modelName: parts[1] };
+}
+
+function validateModelCapability(provider: string, modelName: string, capability: 'embedding' | 'tokenization'): void {
+  const models = capability === 'embedding' ? EMBEDDING_MODELS : TOKENIZATION_MODELS;
+  const supportedModels = models[provider] || [];
+  
+  if (!supportedModels.includes(modelName)) {
+    throw new Error(`Model ${provider}/${modelName} does not support ${capability} functionality`);
+  }
 }
 
 function getProvider(providerName: string): OpenAIProvider | AnthropicProvider | GoogleProvider {
@@ -61,6 +83,10 @@ export function configure(newConfig: LibraryConfig): void {
 
 export async function embedText(model: string, text: string): Promise<EmbeddingResult> {
   const { provider, modelName } = parseModel(model);
+  
+  // Validate that the model supports embeddings
+  validateModelCapability(provider, modelName, 'embedding');
+  
   const providerInstance = getProvider(provider);
   
   if (!('embed' in providerInstance)) {
@@ -73,6 +99,9 @@ export async function embedText(model: string, text: string): Promise<EmbeddingR
 export async function countTokens(model: string, text: string): Promise<number> {
   const { provider, modelName } = parseModel(model);
   const providerInstance = getProvider(provider);
+  
+  // Validate that the model supports tokenization
+  validateModelCapability(provider, modelName, 'tokenization');
   
   if (provider === 'openai' && providerInstance instanceof OpenAIProvider) {
     const tokenizer = providerInstance.getTokenizer(modelName);

@@ -47,7 +47,7 @@ export interface SplitTextOptions {
 }
 
 export interface TruncateOptions {
-  strategy?: 'early' | 'late' | 'balanced';
+  strategy?: 'early' | 'late';
   preserveSystem?: boolean;
 }
 

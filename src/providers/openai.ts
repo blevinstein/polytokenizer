@@ -28,23 +28,24 @@ export class OpenAIProvider implements EmbeddingProvider {
   }
 
   async embed(text: string, model: string): Promise<EmbeddingResult> {
-    if (!this.supportedModels.includes(model)) {
+    const modelName = model.replace('openai/', '');
+    if (!this.supportedModels.includes(modelName)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }
 
     try {
       const response = await this.client.embeddings.create({
-        model,
+        model: modelName,
         input: text,
       });
 
       const embedding = response.data[0].embedding;
       const tokens = response.usage.prompt_tokens;
-      const cost = this.calculateEmbeddingCost(model, tokens);
+      const cost = this.calculateEmbeddingCost(modelName, tokens);
 
       return {
         vector: embedding,
-        model,
+        model: modelName,
         usage: {
           tokens,
           cost,
