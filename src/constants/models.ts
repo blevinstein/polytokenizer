@@ -1,7 +1,7 @@
 /**
  * Model constants and configurations
  * 
- * This file contains all model-related constants including families, context limits,
+ * This file contains all model-related constants including context limits,
  * and supported capabilities. Update this file when providers add new models or change specifications.
  * 
  * Sources for model information:
@@ -9,51 +9,6 @@
  * - Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
  * - Google Gemini: https://ai.google.dev/gemini-api/docs/models
  */
-
-export const MODEL_FAMILIES = {
-  // OpenAI - Latest models (o200k_base tokenizer)
-  'gpt-4.1': 'gpt-4.1',
-  'gpt-4.1-mini': 'gpt-4.1',
-  'o4-mini': 'o4',
-  'o3': 'o3',
-  'o1': 'o1',
-  'o1-preview': 'o1',
-  'o1-mini': 'o1',
-  'gpt-4o': 'gpt-4o',
-  'gpt-4o-mini': 'gpt-4o',
-  
-  // OpenAI - Older models (cl100k_base tokenizer)
-  'gpt-4': 'gpt-4',
-  'gpt-4-turbo': 'gpt-4',
-  'gpt-3.5-turbo': 'gpt-3.5',
-  
-  // Anthropic - Claude 4 series (using official aliases)
-  'claude-opus-4-0': 'claude-4',
-  'claude-sonnet-4-0': 'claude-4',
-  
-  // Anthropic - Claude 3 series (using official aliases)
-  'claude-3-7-sonnet-latest': 'claude-3.7',
-  'claude-3-5-sonnet-latest': 'claude-3.5',
-  'claude-3-5-haiku-latest': 'claude-3.5',
-  'claude-3-opus-latest': 'claude-3',
-  
-  // Google - Latest models
-  'gemini-2.5-pro': 'gemini-2.5',
-  'gemini-2.5-flash': 'gemini-2.5',
-  'gemini-2.0-flash': 'gemini-2.0',
-  'gemini-1.5-pro': 'gemini-1.5',
-  'gemini-1.5-flash': 'gemini-1.5',
-  'gemini-1.5-flash-8b': 'gemini-1.5',
-  'gemini-pro': 'gemini-1.0',
-  
-  // Embedding models
-  'text-embedding-3-small': 'text-embedding-3',
-  'text-embedding-3-large': 'text-embedding-3',
-  'text-embedding-ada-002': 'text-embedding-ada',
-  'gemini-embedding-exp-03-07': 'gemini-embedding',
-  'text-embedding-004': 'text-embedding-004',
-  'embedding-001': 'embedding-001',
-} as const;
 
 export const CONTEXT_LIMITS = {
   // OpenAI - Latest models
@@ -143,5 +98,4 @@ export const TOKENIZATION_MODELS: Record<string, string[]> = {
   ]
 };
 
-export type SupportedModel = keyof typeof CONTEXT_LIMITS;
-export type ModelFamily = typeof MODEL_FAMILIES[keyof typeof MODEL_FAMILIES]; 
+export type SupportedModel = keyof typeof CONTEXT_LIMITS; 
