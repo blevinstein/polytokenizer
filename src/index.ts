@@ -3,6 +3,7 @@
 import { OpenAIProvider } from './providers/openai.js';
 import { AnthropicProvider } from './providers/anthropic.js';
 import { GoogleProvider } from './providers/google.js';
+import { EMBEDDING_MODELS, TOKENIZATION_MODELS } from './constants/models.js';
 import type { EmbeddingResult, LibraryConfig, Message, TruncateOptions, SplitTextOptions } from './types/index.js';
 
 interface ProviderInstances {
@@ -13,39 +14,6 @@ interface ProviderInstances {
 
 let config: LibraryConfig = {};
 let providers: ProviderInstances = {};
-
-const EMBEDDING_MODELS: Record<string, string[]> = {
-  openai: ['text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002'],
-  google: ['gemini-embedding-exp-03-07', 'text-embedding-004', 'embedding-001'],
-  anthropic: [] // Anthropic doesn't have public embedding API
-};
-
-// Models that support tokenization (both chat and embedding models)
-const TOKENIZATION_MODELS: Record<string, string[]> = {
-  openai: [
-    // Latest models (o200k_base tokenizer)
-    'gpt-4.1', 'gpt-4.1-mini', 'o4-mini', 'o3', 'o1', 'o1-preview', 'o1-mini', 
-    'gpt-4o', 'gpt-4o-mini',
-    // Older models (cl100k_base tokenizer)
-    'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo',
-    // Embedding models (cl100k_base tokenizer)
-    'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002'
-  ],
-  anthropic: [
-    // Claude 4 series
-    'claude-opus-4-0', 'claude-sonnet-4-0',
-    // Claude 3 series (using Anthropic aliases)
-    'claude-3-7-sonnet-latest', 'claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest',
-    'claude-3-opus-latest',
-  ],
-  google: [
-    // Gemini chat models
-    'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash', 
-    'gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b',
-    // Embedding models
-    'gemini-embedding-exp-03-07', 'text-embedding-004', 'embedding-001'
-  ]
-};
 
 function parseModel(model: string): { provider: string; modelName: string } {
   const parts = model.split('/');

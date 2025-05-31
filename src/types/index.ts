@@ -77,65 +77,10 @@ export interface ProviderError extends Error {
   retryable?: boolean;
 }
 
-export const MODEL_FAMILIES = {
-  // OpenAI
-  'gpt-4o': 'gpt-4',
-  'gpt-4o-mini': 'gpt-4',
-  'gpt-4': 'gpt-4',
-  'gpt-4-turbo': 'gpt-4',
-  'gpt-3.5-turbo': 'gpt-3.5',
-  'o1-preview': 'o1',
-  'o1-mini': 'o1',
-  
-  // Anthropic
-  'claude-3-5-sonnet-20241022': 'claude-3.5',
-  'claude-3-5-haiku-20241022': 'claude-3.5',
-  'claude-3-opus-20240229': 'claude-3',
-  'claude-3-sonnet-20240229': 'claude-3',
-  'claude-3-haiku-20240307': 'claude-3',
-  'claude-3-7-sonnet-20250219': 'claude-3.7',
-  
-  // Google
-  'gemini-1.5-pro': 'gemini-1.5',
-  'gemini-1.5-flash': 'gemini-1.5',
-  'gemini-pro': 'gemini-1.0',
-  'gemini-embedding-exp-03-07': 'gemini-embedding',
-} as const;
-
-export const CONTEXT_LIMITS = {
-  // OpenAI models
-  'gpt-4o': 128000,
-  'gpt-4o-mini': 128000,
-  'gpt-4': 8192,
-  'gpt-4-turbo': 128000,
-  'gpt-3.5-turbo': 16385,
-  'o1-preview': 128000,
-  'o1-mini': 128000,
-  
-  // Anthropic models
-  'claude-4-sonnet': 200_000,
-  'claude-4-opus': 200_000,
-  'claude-3.5-sonnet': 200_000,
-  'claude-3.5-haiku': 200_000,
-  'claude-3-opus': 200_000,
-  'claude-3-sonnet': 200_000,
-  'claude-3-haiku': 200_000,
-  'claude-3.7-sonnet': 200000,
-  'claude-3.7-opus': 200000,
-  
-  // Google models
-  'gemini-1.5-pro': 1000000,
-  'gemini-1.5-flash': 1000000,
-  'gemini-pro': 32768,
-  
-  // OpenAI Embedding models
-  'text-embedding-3-small': 8192,
-  'text-embedding-3-large': 8192,
-  'text-embedding-ada-002': 8192,
-  
-  // Google Embedding models
-  'gemini-embedding-exp-03-07': 2048,
-} as const;
-
-export type SupportedModel = keyof typeof CONTEXT_LIMITS;
-export type ModelFamily = typeof MODEL_FAMILIES[keyof typeof MODEL_FAMILIES]; 
+// Import model constants from the consolidated constants file
+export { 
+  MODEL_FAMILIES, 
+  CONTEXT_LIMITS, 
+  type SupportedModel, 
+  type ModelFamily 
+} from '../constants/models.js'; 
