@@ -4,9 +4,11 @@ import { countTokens, configure } from '../../src/index.js';
 
 describe('AnthropicProvider', () => {
   let provider: AnthropicProvider;
+  const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
   
   beforeEach(() => {
-    provider = new AnthropicProvider('fake-api-key-for-testing');
+    const apiKey = process.env.ANTHROPIC_API_KEY || 'fake-api-key-for-testing';
+    provider = new AnthropicProvider(apiKey);
   });
 
   describe('Unit Tests', () => {
@@ -23,15 +25,16 @@ describe('AnthropicProvider', () => {
 
     describe('Tokenization Support', () => {
       it('should provide tokenizer for models', () => {
-        const tokenizer = provider.getTokenizer('test-model');
+        const tokenizer = provider.getTokenizer('claude-3-5-sonnet-latest');
         expect(tokenizer).toBeDefined();
         expect(typeof tokenizer.count).toBe('function');
       });
 
-      it('should provide async tokenization', () => {
-        const tokenizer = provider.getTokenizer('test-model');
-        const result = tokenizer.count('Hello world');
-        expect(result).toBeDefined();
+      it.skipIf(!hasApiKey)('should provide async tokenization', async () => {
+        const tokenizer = provider.getTokenizer('claude-3-5-sonnet-latest');
+        const result = await tokenizer.count('Hello world');
+        expect(typeof result).toBe('number');
+        expect(result).toBeGreaterThan(0);
       });
     });
 
@@ -53,8 +56,6 @@ describe('AnthropicProvider', () => {
   });
 
   describe('Integration Tests', () => {
-    const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-    
     beforeAll(() => {
       if (hasApiKey) {
         configure({ anthropic: { apiKey: process.env.ANTHROPIC_API_KEY! } });
