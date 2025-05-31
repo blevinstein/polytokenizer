@@ -2,9 +2,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { EmbeddingResult, EmbeddingProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
 const EMBEDDING_MODELS = [
-  'gemini-embedding-exp-03-07',
-  'text-embedding-004',
-  'embedding-001'
+  'gemini-embedding-exp-03-07', // 3072 dimensions, 8K input, experimental (Mar 2025)
+  'text-embedding-004',         // 768 dimensions, current recommended model
+  'embedding-001'               // 768 dimensions, legacy model
 ];
 
 export class GoogleProvider implements EmbeddingProvider {

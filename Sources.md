@@ -42,6 +42,7 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 |----------|----------------------|-------|-----------|-------------------|---------|----------|-------|
 | OpenAI | ✅ Implemented | text-embedding-3-small | ~8k tokens | 1536 | $0.02/MTok | 🟢 High | Good performance/price |
 | OpenAI | ✅ Implemented | text-embedding-3-large | ~8k tokens | 3072 | $0.13/MTok | 🟡 Medium | High quality, higher cost |
+| Google (Gemini) | ✅ Implemented | gemini-embedding-exp-03-07 | 8k tokens | 3072 | Included in usage | 🟢 High | **SOTA performance**, experimental |
 | Google (Gemini) | ✅ Implemented | text-embedding-004 | ~2k tokens | 768 | Included in usage | 🟢 High | Free with API usage |
 | Snowflake | ❌ Not Implemented | arctic-embed-l | ~8k tokens | 1024 | Free (Apache 2.0) | 🟢 High | SOTA performance, free |
 | Jina AI | ❌ Not Implemented | jina-embeddings-v3 | 8192 tokens | 1024 | API pricing | 🟢 High | Good performance, reasonable cost |
@@ -118,7 +119,7 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 **Embedding Models:**
 - `text-embedding-3-small`: 1536 dimensions, $0.02/MTok, **cl100k_base** tokenizer
 - `text-embedding-3-large`: 3072 dimensions, $0.13/MTok, **cl100k_base** tokenizer
-- `text-embedding-ada-002`: 1536 dimensions, $0.10/MTok, **cl100k_base** tokenizer
+- `text-embedding-ada-002`: 1536 dimensions, $0.10/MTok, **cl100k_base** tokenizer (legacy, still supported)
 
 **Tokenizer Mapping:**
 | Tokenizer | Models |
@@ -164,6 +165,7 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 - Gemini API Models: https://ai.google.dev/gemini-api/docs/models
 - Gemini API Embeddings: https://ai.google.dev/gemini-api/docs/embeddings
 - Gemini API Reference: https://ai.google.dev/api/rest
+- Experimental Gemini Embedding: https://developers.googleblog.com/en/gemini-embedding-text-model-now-available-gemini-api/
 
 **Current Models (as of May 2025):**
 
@@ -180,11 +182,18 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 - `gemini-1.5-flash-8b`: 1M context, $0.0375/MTok input, $0.15/MTok output
 
 **Embedding Models (Direct API):**
+- `gemini-embedding-exp-03-07`: 3072 dimensions, 8K tokens input, **experimental** (announced March 2025)
+  - **Top MTEB Performance**: 68.32 mean score (+5.81 over next competitor)
+  - **Matryoshka Representation Learning**: Supports dimension truncation from 3K
+  - **Multilingual**: 100+ languages supported
+  - **Unified Model**: Surpasses previous task-specific models
+  - **Status**: Experimental with limited capacity, subject to change
 - `text-embedding-004`: 768 dimensions
 - `embedding-001`: 768 dimensions (legacy)
 
 **Notes on Vertex AI vs Direct API:**
 - **Vertex AI** offers additional specialized embedding models (`text-embedding-005`, `text-multilingual-embedding-002`)
+- **Vertex AI** naming for experimental model: `text-embedding-large-exp-03-07`
 - **Direct API** has simpler authentication but fewer embedding options
 - **Vertex AI** provides enterprise features (VPC, audit logs, data residency)
 

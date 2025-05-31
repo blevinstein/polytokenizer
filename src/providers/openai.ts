@@ -80,11 +80,22 @@ export class OpenAIProvider implements EmbeddingProvider {
   private getEncodingForModel(model?: string): 'gpt2' | 'cl100k_base' | 'o200k_base' {
     if (!model) return 'cl100k_base';
     
-    if (model.startsWith('gpt-4o') || model.startsWith('o1')) {
+    // o200k_base models (newer models)
+    if (model.startsWith('gpt-4.1') || 
+        model.startsWith('gpt-4o') || 
+        model.startsWith('o1') || 
+        model.startsWith('o3') || 
+        model.startsWith('o4')) {
       return 'o200k_base';
-    } else if (model.startsWith('gpt-4') || model.startsWith('gpt-3.5')) {
+    } 
+    // cl100k_base models (older GPT-4 and GPT-3.5)
+    else if (model.startsWith('gpt-4') || 
+             model.startsWith('gpt-3.5') || 
+             model.startsWith('text-embedding')) {
       return 'cl100k_base';
-    } else {
+    } 
+    // Legacy models
+    else {
       return 'gpt2';
     }
   }

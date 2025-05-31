@@ -22,9 +22,29 @@ const EMBEDDING_MODELS: Record<string, string[]> = {
 
 // Models that support tokenization (both chat and embedding models)
 const TOKENIZATION_MODELS: Record<string, string[]> = {
-  openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'o1-preview', 'o1-mini', 'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002'],
-  anthropic: ['claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'],
-  google: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro', 'gemini-embedding-exp-03-07', 'text-embedding-004', 'embedding-001']
+  openai: [
+    // Latest models (o200k_base tokenizer)
+    'gpt-4.1', 'gpt-4.1-mini', 'o4-mini', 'o3', 'o1', 'o1-preview', 'o1-mini', 
+    'gpt-4o', 'gpt-4o-mini',
+    // Older models (cl100k_base tokenizer)
+    'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo',
+    // Embedding models (cl100k_base tokenizer)
+    'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002'
+  ],
+  anthropic: [
+    // Claude 4 series
+    'claude-4-opus', 'claude-4-sonnet',
+    // Claude 3 series (using shorter aliases)
+    'claude-3.7-sonnet', 'claude-3.5-sonnet', 'claude-3.5-haiku', 
+    'claude-3-opus', 'claude-3-haiku'
+  ],
+  google: [
+    // Gemini chat models
+    'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash', 
+    'gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b',
+    // Embedding models
+    'gemini-embedding-exp-03-07', 'text-embedding-004', 'embedding-001'
+  ]
 };
 
 function parseModel(model: string): { provider: string; modelName: string } {
