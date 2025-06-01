@@ -8,6 +8,7 @@
  * - OpenAI: https://platform.openai.com/docs/models/
  * - Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
  * - Google Gemini: https://ai.google.dev/gemini-api/docs/models
+ * - Vertex AI: https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings
  */
 
 export const CONTEXT_LIMITS = {
@@ -55,6 +56,10 @@ export const CONTEXT_LIMITS = {
   'gemini-embedding-exp-03-07': 8_192,
   'text-embedding-004': 2_048,
   'embedding-001': 2_048,
+  
+  // Vertex AI Embedding models
+  'text-embedding-005': 2_048,
+  'text-multilingual-embedding-002': 2_048,
 } as const;
 
 export const EMBEDDING_MODELS: Record<string, string[]> = {
@@ -67,6 +72,11 @@ export const EMBEDDING_MODELS: Record<string, string[]> = {
     'gemini-embedding-exp-03-07', 
     'text-embedding-004', 
     'embedding-001'
+  ],
+  vertex: [
+    'text-embedding-005',
+    'text-embedding-004',
+    'text-multilingual-embedding-002'
   ],
   anthropic: [] // Anthropic doesn't have public embedding API
 };

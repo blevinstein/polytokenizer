@@ -1,0 +1,13 @@
+# Copy this file to terraform.tfvars and customize
+
+# GCP Project ID (required)
+project_id = "your-project-id"
+
+# GCP Region (optional, defaults to us-central1)
+region = "us-central1"
+
+# GCP Zone (optional, defaults to us-central1-a)  
+zone = "us-central1-a"
+
+# Service account name (optional, defaults to vertex-ai-embeddings)
+service_account_name = "vertex-ai-embeddings" 

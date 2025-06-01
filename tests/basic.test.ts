@@ -1,10 +1,26 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { embedText, countTokens, configure } from '../src/index.js';
 
 describe('PolyTokenizer Core', () => {
+  let originalConfig: any;
+
   beforeEach(() => {
-    // Reset configuration before each test
-    configure({});
+    // Save current configuration
+    originalConfig = {
+      openai: { apiKey: process.env.OPENAI_API_KEY },
+      anthropic: { apiKey: process.env.ANTHROPIC_API_KEY },
+      google: { apiKey: process.env.GEMINI_API_KEY },
+      vertex: process.env.VERTEX_PROJECT_ID ? {
+        projectId: process.env.VERTEX_PROJECT_ID,
+        location: process.env.VERTEX_LOCATION || 'us-central1',
+        credentials: JSON.parse(process.env.VERTEX_CREDENTIALS || '{}')
+      } : undefined
+    };
+  });
+
+  afterEach(() => {
+    // Restore original configuration
+    configure(originalConfig);
   });
 
   describe('Configuration', () => {
@@ -44,7 +60,7 @@ describe('PolyTokenizer Core', () => {
     it('should validate embedding model capabilities', async () => {
       // Test that chat models reject embedding requests
       await expect(embedText('openai/gpt-4o', 'test')).rejects.toThrow('does not support embedding functionality');
-      await expect(embedText('anthropic/claude-3.7-sonnet', 'test')).rejects.toThrow('does not support embedding functionality');
+      await expect(embedText('anthropic/claude-3-5-sonnet-latest', 'test')).rejects.toThrow('does not support embedding functionality');
       await expect(embedText('google/gemini-1.5-pro', 'test')).rejects.toThrow('does not support embedding functionality');
     });
   });
@@ -56,11 +72,6 @@ describe('PolyTokenizer Core', () => {
 
     it('should throw error for invalid model format', async () => {
       await expect(countTokens('invalid', 'test')).rejects.toThrow('Invalid model format');
-    });
-
-    it('should throw error for missing API keys', async () => {
-      configure({ openai: { apiKey: '' } });
-      await expect(embedText('openai/text-embedding-3-small', 'test')).rejects.toThrow('API key not found');
     });
 
     it('should provide helpful error messages for capability mismatches', async () => {

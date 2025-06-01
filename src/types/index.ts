@@ -13,7 +13,7 @@ export interface TokenCountResult {
 }
 
 export interface ModelInfo {
-  provider: 'openai' | 'anthropic' | 'google';
+  provider: 'openai' | 'anthropic' | 'google' | 'vertex';
   family: string;
   contextLimit: number;
   supportsEmbedding: boolean;
@@ -34,10 +34,17 @@ export interface ProviderConfig {
   timeout?: number;
 }
 
+export interface VertexConfig {
+  projectId: string;
+  location?: string;
+  credentials: any; // Service account JSON object
+}
+
 export interface LibraryConfig {
   openai?: ProviderConfig;
   anthropic?: ProviderConfig;
   google?: ProviderConfig;
+  vertex?: VertexConfig;
 }
 
 export interface SplitTextOptions {

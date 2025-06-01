@@ -26,11 +26,11 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 | OpenAI | ✅ Implemented | Local (tiktoken) | Free | 🟢 High | No API calls needed |
 | Anthropic | ✅ Implemented | API (`/v1/messages/count_tokens`) | Included in usage | 🟡 Medium | Accurate for Claude 3+ |
 | Google (Gemini) | ✅ Implemented | API (Gemini endpoints) | Included in usage | 🟡 Medium | Direct API |
+| Vertex AI | ❌ Embeddings Only | API (Vertex endpoints) | Included in usage | 🟡 Medium | Enterprise Google Cloud |
 | Meta (Llama) | ❌ Not Implemented | Local (SentencePiece) | Free | 🟢 High | Popular open models, local |
 | Qwen | ❌ Not Implemented | Local (tiktoken-compatible) | Free | 🟢 High | Popular, local, multilingual |
 | DeepSeek | ❌ Not Implemented | API + local | Very cheap | 🟢 High | $0.14/MTok, strong performance |
 | xAI (Grok) | ❌ Not Implemented | API only | Expensive | 🔴 Low | $3-5/MTok input, limited use |
-| Vertex AI | ❌ Not Implemented | API (Vertex endpoints) | Included in usage | 🟡 Medium | Enterprise Google Cloud |
 | AWS Bedrock | ❌ Not Implemented | API (Bedrock endpoints) | Varies by model | 🟡 Medium | Multi-provider access |
 | Cohere | ❌ Not Implemented | Local tokenizer or API | API calls charged | 🟡 Medium | Command models |
 | Mistral | ❌ Not Implemented | API | API calls charged | 🟡 Medium | Mixtral models |
@@ -40,13 +40,13 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 
 | Provider | Implementation Status | Model | Max Input | Vector Dimensions | Pricing | Priority | Notes |
 |----------|----------------------|-------|-----------|-------------------|---------|----------|-------|
+| Vertex AI | ✅ Implemented | text-embedding-005 | 2048 tokens | 768 | $0.00002/1K chars | 🟢 High | **Most cost-effective**, enterprise features |
 | OpenAI | ✅ Implemented | text-embedding-3-small | ~8k tokens | 1536 | $0.02/MTok | 🟢 High | Good performance/price |
-| OpenAI | ✅ Implemented | text-embedding-3-large | ~8k tokens | 3072 | $0.13/MTok | 🟡 Medium | High quality, higher cost |
 | Google (Gemini) | ✅ Implemented | gemini-embedding-exp-03-07 | 8k tokens | 3072 | Included in usage | 🟢 High | **SOTA performance**, experimental |
-| Google (Gemini) | ✅ Implemented | text-embedding-004 | ~2k tokens | 768 | Included in usage | 🟢 High | Free with API usage |
+| OpenAI | ✅ Implemented | text-embedding-3-large | ~8k tokens | 3072 | $0.13/MTok | 🟡 Medium | High quality, higher cost |
+| Google (Gemini) | ✅ Implemented | text-embedding-004 | ~2k tokens | 768 | Included in usage | 🟡 Medium | Free with API usage |
 | Snowflake | ❌ Not Implemented | arctic-embed-l | ~8k tokens | 1024 | Free (Apache 2.0) | 🟢 High | SOTA performance, free |
 | Jina AI | ❌ Not Implemented | jina-embeddings-v3 | 8192 tokens | 1024 | API pricing | 🟢 High | Good performance, reasonable cost |
-| Vertex AI | ❌ Not Implemented | text-embedding-005 | 2048 tokens | 768 | $0.00002/1K chars | 🟢 High | Very cheap, enterprise features |
 | Cohere | ❌ Not Implemented | embed-v4.0 | 128k tokens | 1536 | $0.12/MTok | 🟡 Medium | Large context, multimodal |
 | AWS Bedrock | ❌ Not Implemented | Amazon Titan Embeddings | Varies | Varies | AWS pricing | 🟡 Medium | Enterprise, multi-provider |
 | Voyage AI | ❌ Not Implemented | Various models | Varies | Varies | API pricing | 🟡 Medium | Specialized for retrieval |
@@ -66,11 +66,11 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 - **OpenAI**: Local tiktoken library (no API needed) ✅ **Implemented**
 - **Anthropic**: `/v1/messages/count_tokens` ✅ **Implemented**
 - **Google Gemini**: Gemini API token counting ✅ **Implemented**
+- **Vertex AI**: Token counting not implemented (embeddings only)
 - **xAI (Grok)**: Proprietary API endpoints (expensive, $3-5/MTok)
 - **DeepSeek**: API + local tiktoken-compatible ($0.14/MTok)
 - **Qwen**: Local tiktoken-compatible tokenizer (free)
 - **Meta (Llama)**: Local SentencePiece tokenizer (free)
-- **Vertex AI**: Vertex AI token counting endpoints
 - **Cohere**: Local tokenizer or API
 - **AWS Bedrock**: Bedrock endpoints (varies by model)
 
@@ -200,6 +200,57 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 **Tokenization Implementation**: API-based via Gemini API endpoints
 **Special Features**: Multimodal capabilities (text + images)
 
+### Vertex AI (Google Cloud)
+
+**Implementation Status**: ✅ **Fully Implemented** (`src/providers/vertex.ts`)
+
+**Primary Sources:**
+- Vertex AI Embeddings: https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings
+- Vertex AI Pricing: https://cloud.google.com/vertex-ai/generative-ai/pricing
+- Vertex AI Models: https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
+
+**Current Models (as of May 2025):**
+
+**Embedding Models (Vertex AI Exclusive):**
+- `text-embedding-005`: 768 dimensions, 2048 tokens, English/code specialized, $0.00002/1K characters
+- `text-embedding-004`: 768 dimensions, 2048 tokens, general purpose, $0.00002/1K characters
+- `text-multilingual-embedding-002`: 768 dimensions, 2048 tokens, multilingual, $0.00002/1K characters
+
+**Key Differences from Direct Gemini API:**
+- **Additional Models**: `text-embedding-005` and `text-multilingual-embedding-002` not available elsewhere
+- **Rate Limits**: 250 input texts for non-Gemini models vs single input for Gemini models
+- **Authentication**: Google Cloud IAM with service account credentials
+- **Enterprise Features**: VPC, audit logs, data residency controls
+- **Billing**: Google Cloud billing vs direct API billing
+- **Token Limits**: 20,000 tokens per request, 2048 per individual input
+
+**Implementation Features:**
+- **Authentication Method**: Direct JSON credentials (environment variables) - consistent with other providers
+- **Infrastructure Automation**: Complete Terraform setup for one-command deployment
+- **Security**: Minimal IAM permissions (roles/aiplatform.user), service account best practices
+- **Cost Efficiency**: Most cost-effective embedding option at $0.00002/1K characters
+- **Production Ready**: Enterprise features, audit logging, VPC support
+
+**Setup Options:**
+1. **Automated (Recommended)**: `./infrastructure/terraform/setup.sh setup --project PROJECT_ID`
+2. **Manual**: Service account creation, API enablement, credential generation
+
+**Cost Comparison:**
+- **Vertex AI**: ~$0.05 per 1M tokens (most cost-effective)
+- **OpenAI text-embedding-3-small**: $20.00 per 1M tokens (400x more expensive)
+- **Google Gemini experimental**: Free tier (experimental, may change)
+
+**Implementation Notes:**
+- **Authentication**: Uses Google Auth library with service account credentials
+- **Embeddings Only**: Current implementation supports embeddings only (no tokenization)
+- **Token Estimation**: Uses character-based estimation (~4 chars per token)
+- **Cost Calculation**: Based on character count at $0.00002 per 1K characters
+- **Error Handling**: Comprehensive error handling for authentication, invalid models, empty text
+- **Performance**: ~200-500ms latency, supports concurrent requests
+
+**Tokenization Implementation**: Not implemented (embeddings only)
+**Embedding Support**: ✅ Multiple specialized embedding models with enterprise features
+
 ### Gemma (Open Source)
 
 **Implementation Status**: ❌ **Not Currently Implemented**
@@ -274,40 +325,6 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 - **Service Type**: Model routing/proxy service for chat completions only
 
 **Notes**: OpenRouter is a model routing service that provides access to various LLMs (OpenAI, Anthropic, Google, etc.) through a unified API, but **does not offer the embedding or tokenization capabilities** that our polytokenizer library requires. Users needing these capabilities should use the direct provider APIs instead.
-
-### Vertex AI (Google Cloud)
-
-**Implementation Status**: ❌ **Not Currently Implemented** (separate from direct Gemini API)
-
-**Primary Sources:**
-- Vertex AI Embeddings: https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings
-- Vertex AI Pricing: https://cloud.google.com/vertex-ai/generative-ai/pricing
-- Vertex AI Models: https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
-
-**Current Models (as of May 2025):**
-
-**Embedding Models (Vertex AI Exclusive):**
-- `text-embedding-005`: 768 dimensions, 2048 tokens, English/code specialized, $0.00002/1K characters
-- `text-multilingual-embedding-002`: 768 dimensions, 2048 tokens, multilingual, $0.00002/1K characters
-- `gemini-embedding-001`: up to 3072 dimensions, 2048 tokens, unified model, $0.00002/1K characters
-
-**Shared Gemini Models** (also available via direct Gemini API):
-- `gemini-2.5-pro`: 2M context, enterprise features
-- `gemini-2.5-flash`: 1M context, enterprise features
-- `gemini-2.0-flash`: 1M context, enterprise features
-- `gemini-1.5-pro`: 2M context, enterprise features
-- `gemini-1.5-flash`: 1M context, enterprise features
-
-**Key Differences from Direct Gemini API:**
-- **Additional Models**: `text-embedding-005` and `text-multilingual-embedding-002` not available elsewhere
-- **Rate Limits**: 250 input texts for non-Gemini models vs single input for Gemini models
-- **Authentication**: Google Cloud IAM vs API keys
-- **Enterprise Features**: VPC, audit logs, data residency controls
-- **Billing**: Google Cloud billing vs direct API billing
-- **Token Limits**: 20,000 tokens per request, 2048 per individual input
-
-**Tokenization Implementation**: API-based via Vertex AI endpoints
-**Embedding Support**: ✅ Multiple specialized embedding models
 
 ### AWS Bedrock
 

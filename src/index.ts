@@ -3,6 +3,7 @@
 import { OpenAIProvider } from './providers/openai.js';
 import { AnthropicProvider } from './providers/anthropic.js';
 import { GoogleProvider } from './providers/google.js';
+import { VertexAIProvider } from './providers/vertex.js';
 import { EMBEDDING_MODELS, TOKENIZATION_MODELS } from './constants/models.js';
 import type { EmbeddingResult, LibraryConfig, Message, TruncateOptions, SplitTextOptions } from './types/index.js';
 
@@ -10,6 +11,7 @@ interface ProviderInstances {
   openai?: OpenAIProvider;
   anthropic?: AnthropicProvider;
   google?: GoogleProvider;
+  vertex?: VertexAIProvider;
 }
 
 let config: LibraryConfig = {};
@@ -32,32 +34,53 @@ function validateModelCapability(provider: string, modelName: string, capability
   }
 }
 
-function getProvider(providerName: string): OpenAIProvider | AnthropicProvider | GoogleProvider {
+function getProvider(providerName: string): OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider {
   // Check if provider is supported before checking API keys
-  if (!['openai', 'anthropic', 'google'].includes(providerName)) {
+  if (!['openai', 'anthropic', 'google', 'vertex'].includes(providerName)) {
     throw new Error(`Unsupported provider: ${providerName}`);
   }
 
   if (!providers[providerName as keyof ProviderInstances]) {
-    const providerConfig = config[providerName as keyof LibraryConfig];
-    const apiKey = providerConfig?.apiKey || process.env[`${providerName.toUpperCase()}_API_KEY`];
-    
-    if (!apiKey) {
-      throw new Error(`API key not found for provider ${providerName}. Set ${providerName.toUpperCase()}_API_KEY environment variable or call configure().`);
-    }
+    if (providerName === 'vertex') {
+      const vertexConfig = config.vertex;
+      if (!vertexConfig?.projectId) {
+        throw new Error(`Vertex AI configuration missing. Set projectId in configure() call.`);
+      }
+      providers.vertex = new VertexAIProvider(
+        vertexConfig.projectId,
+        vertexConfig.location,
+        vertexConfig.credentials
+      );
+    } else {
+      const providerConfig = config[providerName as 'openai' | 'anthropic' | 'google'];
+      
+      // Map provider names to their correct environment variable names
+      const envVarMap = {
+        'openai': 'OPENAI_API_KEY',
+        'anthropic': 'ANTHROPIC_API_KEY',
+        'google': 'GEMINI_API_KEY'
+      };
+      
+      const apiKey = providerConfig?.apiKey || process.env[envVarMap[providerName as keyof typeof envVarMap]];
+      
+      if (!apiKey) {
+        const envVarName = envVarMap[providerName as keyof typeof envVarMap];
+        throw new Error(`API key not found for provider ${providerName}. Set ${envVarName} environment variable or call configure().`);
+      }
 
-    switch (providerName) {
-      case 'openai':
-        providers.openai = new OpenAIProvider(apiKey, providerConfig?.baseURL);
-        break;
-      case 'anthropic':
-        providers.anthropic = new AnthropicProvider(apiKey, providerConfig?.baseURL);
-        break;
-      case 'google':
-        providers.google = new GoogleProvider(apiKey);
-        break;
-      default:
-        throw new Error(`Unsupported provider: ${providerName}`);
+      switch (providerName) {
+        case 'openai':
+          providers.openai = new OpenAIProvider(apiKey, providerConfig?.baseURL);
+          break;
+        case 'anthropic':
+          providers.anthropic = new AnthropicProvider(apiKey, providerConfig?.baseURL);
+          break;
+        case 'google':
+          providers.google = new GoogleProvider(apiKey);
+          break;
+        default:
+          throw new Error(`Unsupported provider: ${providerName}`);
+      }
     }
   }
 
