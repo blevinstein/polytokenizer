@@ -60,15 +60,6 @@ describe('GoogleProvider', () => {
         expect(typeof count).toBe('number');
       });
 
-      // TODO: Currently failing with 404 - experimental model may not support countTokens API yet
-      // The API documentation suggests it should work, but getting "not found for API version v1beta"
-      // or "not supported for countTokens" error. This should be re-enabled when the API is fixed.
-      it.skip('should count tokens for embedding models', async () => {
-        const count = await countTokens('google/gemini-embedding-exp-03-07', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
-      });
-
       it.skipIf(!hasApiKey)('should handle longer text correctly', async () => {
         const shortText = 'Hello';
         const longText = 'Hello world this is a longer sentence with more words and punctuation!';
