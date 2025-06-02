@@ -246,14 +246,34 @@ const messages = [
 ];
 
 const trimmed = await trimMessages(messages, 'openai/gpt-4o', 4000, {
-  strategy: 'early',      // 'early' | 'late'
-  preserveSystem: true    // default: true
+  strategy: 'early',           // 'early' | 'late'
+  preserveSystem: true,        // default: true
+  extraTokensPerMessage: 4,    // optional: tokens added per message (default: 4)
+  extraTokensTotal: 2          // optional: tokens added for conversation overhead (default: 2)
 });
 ```
 
-**Strategies:**
-- `early`: Remove oldest non-system messages first (default)
-- `late`: Remove newer messages first
+**Parameters:**
+- `messages` (array): Array of message objects with `role` and `content`
+- `model` (string): Model identifier for accurate token counting
+- `maxTokens` (number): Maximum total tokens allowed
+- `options` (object, optional): Trimming options
+
+**Options:**
+- `strategy`: Trimming strategy
+  - `'early'`: Remove oldest non-system messages first (default)
+  - `'late'`: Remove newer messages first
+- `preserveSystem`: Keep system messages (default: `true`)
+- `extraTokensPerMessage`: Additional tokens per message for chat formatting overhead (default: 4 for OpenAI models, 0 for others)
+- `extraTokensTotal`: Additional tokens for entire conversation overhead (default: 2 for OpenAI models, 0 for others)
+
+**Chat Format Overhead:**
+OpenAI models add extra tokens for chat formatting:
+- **4 tokens per message** for role boundaries and structure
+- **2 tokens total** for priming the assistant response
+- These defaults are automatically applied for OpenAI models but can be overridden
+
+**Returns:** `Promise<Message[]>` - Trimmed messages that fit within token limit
 
 ## Supported Models
 

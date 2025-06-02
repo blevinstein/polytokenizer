@@ -56,6 +56,16 @@ export interface SplitTextOptions {
 export interface TruncateOptions {
   strategy?: 'early' | 'late';
   preserveSystem?: boolean;
+  /**
+   * Extra tokens added per message for chat formatting overhead (e.g., OpenAI adds ~4 tokens per message for role/boundaries)
+   * Defaults to 4 for OpenAI models, 0 for others
+   */
+  extraTokensPerMessage?: number;
+  /**
+   * Extra tokens added for the entire conversation (e.g., OpenAI adds 2 tokens for priming assistant reply)
+   * Defaults to 2 for OpenAI models, 0 for others
+   */
+  extraTokensTotal?: number;
 }
 
 export interface OptimizeOptions {

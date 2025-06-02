@@ -191,12 +191,19 @@ export async function trimMessages(messages: Message[], model: string, maxTokens
   
   if (messages.length === 0) return [];
 
+  // TODO: Determine token overhead based on model
+  const extraTokensPerMessage = 4;
+  const extraTokensTotal = 2;
+
   const messageTokens = await async.map(messages, async (message: Message) => {
-    const tokens = await countTokens(model, message.content);
-    return { message, tokens };
+    const contentTokens = await countTokens(model, message.content);
+    const totalTokens = contentTokens + extraTokensPerMessage;
+    return { message, tokens: totalTokens };
   });
 
-  const totalTokens = messageTokens.reduce((sum, m) => sum + m.tokens, 0);
+  // Calculate total tokens including conversation overhead
+  const contentTokens = messageTokens.reduce((sum, m) => sum + m.tokens, 0);
+  const totalTokens = contentTokens + extraTokensTotal;
 
   if (totalTokens <= maxTokens) {
     return messages;
@@ -210,7 +217,8 @@ export async function trimMessages(messages: Message[], model: string, maxTokens
     systemTokens = systemMessages.reduce((sum, m) => sum + m.tokens, 0);
   }
 
-  const availableTokens = maxTokens - systemTokens;
+  // Account for total overhead when calculating available tokens
+  const availableTokens = maxTokens - systemTokens - extraTokensTotal;
   if (availableTokens <= 0) {
     return preserveSystem ? systemMessages.map(m => m.message) : [];
   }
