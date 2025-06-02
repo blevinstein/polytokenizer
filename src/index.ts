@@ -133,7 +133,6 @@ export function configure(newConfig: LibraryConfig): void {
 export async function embedText(model: string, text: string): Promise<EmbeddingResult> {
   const { provider, modelName } = parseModel(model);
   
-  // Validate that the model supports embeddings (this implicitly validates provider support too)
   validateModelCapability(provider, modelName, 'embedding');
   
   const providerInstance = getEmbeddingProvider(provider);
@@ -144,7 +143,6 @@ export async function embedText(model: string, text: string): Promise<EmbeddingR
 export async function countTokens(model: string, text: string): Promise<number> {
   const { provider, modelName } = parseModel(model);
   
-  // Validate that the model supports tokenization (this implicitly validates provider support too)
   validateModelCapability(provider, modelName, 'tokenization');
   
   const providerInstance = getTokenizerProvider(provider);
