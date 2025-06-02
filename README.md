@@ -208,12 +208,12 @@ const count = await countTokens('google/gemini-1.5-pro', 'Hello world');
 
 ### Text Splitting
 
-#### `splitTextMaxTokens(model, text, maxTokens, options?)`
+#### `splitTextMaxTokens(text, model, maxTokens, options?)`
 
 Split text into chunks that fit within the specified token limit.
 
 ```javascript
-const chunks = await splitTextMaxTokens('openai/gpt-4o', longText, 1000, {
+const chunks = await splitTextMaxTokens(longText, 'openai/gpt-4o', 1000, {
   preserveSentences: true,  // default: true
   preserveWords: true       // default: true
 });
@@ -221,8 +221,8 @@ const chunks = await splitTextMaxTokens('openai/gpt-4o', longText, 1000, {
 ```
 
 **Parameters:**
-- `model` (string): Model identifier (for accurate token counting)
 - `text` (string): Text to split
+- `model` (string): Model identifier (for accurate token counting)
 - `maxTokens` (number): Maximum tokens per chunk
 - `options` (object, optional): Splitting preferences
 

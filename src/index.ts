@@ -134,7 +134,7 @@ export async function countTokens(model: string, text: string): Promise<number> 
   return providerInstance.countTokens(modelName, text);
 }
 
-export async function splitTextMaxTokens(model: string, text: string, maxTokens: number, options: SplitTextOptions = {}): Promise<string[]> {
+export async function splitTextMaxTokens(text: string, model: string, maxTokens: number, options: SplitTextOptions = {}): Promise<string[]> {
   const { preserveSentences = true, preserveWords = true } = options;
 
   if (!text || maxTokens <= 0) {

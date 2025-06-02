@@ -16,14 +16,14 @@ describe('Text Processing Integration', () => {
 
   describe('Text Splitting', () => {
     it.skipIf(!hasOpenAIKey)('should return single chunk for short text (OpenAI)', async () => {
-      const chunks = await splitTextMaxTokens('openai/gpt-4o', 'Hello world', 100);
+      const chunks = await splitTextMaxTokens('Hello world', 'openai/gpt-4o', 100);
       expect(chunks).toHaveLength(1);
       expect(chunks[0]).toBe('Hello world');
     });
 
     it.skipIf(!hasOpenAIKey)('should split long text into multiple chunks (OpenAI)', async () => {
       const longText = Array(100).fill('This is a sentence.').join(' ');
-      const chunks = await splitTextMaxTokens('openai/gpt-4o', longText, 50);
+      const chunks = await splitTextMaxTokens(longText, 'openai/gpt-4o', 50);
       
       expect(chunks.length).toBeGreaterThan(1);
       
@@ -37,7 +37,7 @@ describe('Text Processing Integration', () => {
 
     it.skipIf(!hasGoogleKey)('should work with Google models', async () => {
       const text = 'Test sentence for splitting with Google models and API integration.';
-      const chunks = await splitTextMaxTokens('google/gemini-1.5-pro', text, 10);
+      const chunks = await splitTextMaxTokens(text, 'google/gemini-1.5-pro', 10);
       
       expect(chunks.length).toBeGreaterThanOrEqual(1);
       expect(chunks.join(' ')).toContain('Test');
@@ -46,7 +46,7 @@ describe('Text Processing Integration', () => {
 
     it.skipIf(!hasAnthropicKey)('should work with Anthropic models', async () => {
       const text = 'Test sentence for splitting with Anthropic models and API integration.';
-      const chunks = await splitTextMaxTokens('anthropic/claude-3-5-sonnet-latest', text, 10);
+      const chunks = await splitTextMaxTokens(text, 'anthropic/claude-3-5-sonnet-latest', 10);
       
       expect(chunks.length).toBeGreaterThanOrEqual(1);
       expect(chunks.join(' ')).toContain('Test');
@@ -54,13 +54,13 @@ describe('Text Processing Integration', () => {
     });
 
     it.skipIf(!hasOpenAIKey)('should handle empty text', async () => {
-      const chunks = await splitTextMaxTokens('openai/gpt-4o', '', 100);
+      const chunks = await splitTextMaxTokens('', 'openai/gpt-4o', 100);
       expect(chunks).toEqual([]);
     });
 
     it.skipIf(!hasOpenAIKey)('should preserve sentences when possible', async () => {
       const text = 'First sentence with many words to make it longer. Second sentence with many words to make it longer. Third sentence with many words to make it longer.';
-      const chunks = await splitTextMaxTokens('openai/gpt-4o', text, 15);
+      const chunks = await splitTextMaxTokens(text, 'openai/gpt-4o', 15);
       
       expect(chunks.length).toBeGreaterThan(1);
       chunks.forEach(chunk => {
