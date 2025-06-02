@@ -1,6 +1,6 @@
 {
   "name": "polytokenizer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A lightweight, multi-provider Node.js library for text tokenization, embedding, and context management",
   "main": "dist/index.js",
   "type": "module",
@@ -60,7 +60,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/polytokenizer.git"
+    "url": "https://github.com/blevinstein/polytokenizer.git"
   },
   "files": [
     "dist",
