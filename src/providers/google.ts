@@ -33,7 +33,7 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
         vector: result.embedding.values,
         model: `google/${model}`,
         usage: {
-          tokens: this.estimateTokens(text),
+          tokens: -1,
         },
       };
     } catch (error: any) {

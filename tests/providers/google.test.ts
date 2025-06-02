@@ -79,7 +79,6 @@ describe('GoogleProvider', () => {
         expect(Array.isArray(result.vector)).toBe(true);
         expect(result.vector.length).toBe(3072); // New model has 3072 dimensions
         expect(result.model).toBe('google/gemini-embedding-exp-03-07');
-        expect(result.usage.tokens).toBeGreaterThan(0);
         
         // Check that vector contains numbers
         expect(result.vector.every(num => typeof num === 'number')).toBe(true);
@@ -92,14 +91,12 @@ describe('GoogleProvider', () => {
         expect(Array.isArray(result.vector)).toBe(true);
         expect(result.vector.length).toBe(768); // text-embedding-004 dimension
         expect(result.model).toBe('google/text-embedding-004');
-        expect(result.usage.tokens).toBeGreaterThan(0);
       });
 
       it.skipIf(!hasApiKey)('should handle different text inputs', async () => {
         const shortResult = await embedText('google/gemini-embedding-exp-03-07', 'Hi');
         const longResult = await embedText('google/gemini-embedding-exp-03-07', 'This is a much longer text that should have more tokens and produce a different embedding vector');
         
-        expect(longResult.usage.tokens).toBeGreaterThan(shortResult.usage.tokens);
         expect(longResult.vector.length).toBe(shortResult.vector.length);
         
         // Vectors should be different

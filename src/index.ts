@@ -134,11 +134,19 @@ export async function countTokens(model: string, text: string): Promise<number> 
   return providerInstance.countTokens(modelName, text);
 }
 
+function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
 export async function splitTextMaxTokens(text: string, model: string, maxTokens: number, options: SplitTextOptions = {}): Promise<string[]> {
   const { preserveSentences = true, preserveWords = true } = options;
 
   if (!text || maxTokens <= 0) {
     return text ? [text] : [];
+  }
+
+  if (estimateTokens(text) <= maxTokens / 2) {
+    return [text];
   }
 
   const tokenCount = await countTokens(model, text);
