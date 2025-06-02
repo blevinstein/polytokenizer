@@ -120,6 +120,23 @@ export const EMBEDDING_LIMITS = {
   'vertex/text-multilingual-embedding-002': 2_048,
 } as const;
 
+export const EMBEDDING_DIMENSIONS = {
+  // OpenAI Embedding models
+  'openai/text-embedding-3-small': 1536,
+  'openai/text-embedding-3-large': 3072,
+  'openai/text-embedding-ada-002': 1536,
+  
+  // Google Embedding models (Gemini API)
+  'google/gemini-embedding-exp-03-07': 3072,
+  'google/text-embedding-004': 768,
+  'google/gemini-embedding-001': 768,
+  
+  // Vertex AI Embedding models
+  'vertex/text-embedding-005': 768,
+  'vertex/text-embedding-004': 768,
+  'vertex/text-multilingual-embedding-002': 768,
+} as const;
+
 export type SupportedModel = keyof typeof CONTEXT_LIMITS;
 export type SupportedEmbeddingModel = keyof typeof EMBEDDING_LIMITS;
 export type SupportedTokenizationModel = typeof TOKENIZATION_MODELS[number];

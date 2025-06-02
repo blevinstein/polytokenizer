@@ -5,7 +5,7 @@ import { OpenAIProvider } from './providers/openai.js';
 import { AnthropicProvider } from './providers/anthropic.js';
 import { GoogleProvider } from './providers/google.js';
 import { VertexAIProvider } from './providers/vertex.js';
-import { EMBEDDING_MODELS, TOKENIZATION_MODELS, TOKENIZATION_PROVIDERS, EMBEDDING_PROVIDERS, EMBEDDING_LIMITS, CONTEXT_LIMITS } from './constants/models.js';
+import { EMBEDDING_MODELS, TOKENIZATION_MODELS, TOKENIZATION_PROVIDERS, EMBEDDING_PROVIDERS, EMBEDDING_LIMITS, EMBEDDING_DIMENSIONS, CONTEXT_LIMITS } from './constants/models.js';
 import type { EmbeddingResult, LibraryConfig, Message, TruncateOptions, SplitTextOptions, TokenizerProvider, EmbeddingProvider } from './types/index.js';
 
 type ProviderInstance = OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider;
@@ -274,4 +274,4 @@ export async function trimMessages(messages: Message[], model: string, maxTokens
   return result.map(m => m.message);
 }
 
-export { EMBEDDING_LIMITS, CONTEXT_LIMITS }; 
+export { EMBEDDING_LIMITS, EMBEDDING_DIMENSIONS, CONTEXT_LIMITS }; 
