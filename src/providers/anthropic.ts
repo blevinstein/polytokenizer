@@ -1,4 +1,4 @@
-import type { TokenizerInterface, ProviderError, Message } from '../types/index.js';
+import type { TokenizerInterface, TokenizerProvider, ProviderError, Message } from '../types/index.js';
 
 interface AnthropicCountTokensRequest {
   model: string;
@@ -11,9 +11,20 @@ interface AnthropicCountTokensResponse {
   input_tokens: number;
 }
 
-export class AnthropicProvider {
+const SUPPORTED_MODELS = [
+  'claude-opus-4-0',
+  'claude-sonnet-4-0',
+  'claude-3-7-sonnet-latest',
+  'claude-3-5-sonnet-latest',
+  'claude-3-5-haiku-latest',
+  'claude-3-opus-latest'
+];
+
+export class AnthropicProvider implements TokenizerProvider {
   private apiKey: string;
   private baseURL: string;
+
+  readonly supportedModels = SUPPORTED_MODELS;
 
   constructor(apiKey: string, baseURL = 'https://api.anthropic.com') {
     this.apiKey = apiKey;
@@ -21,8 +32,6 @@ export class AnthropicProvider {
   }
 
   async countTokens(model: string, text: string): Promise<number> {
-    const messages = [{ role: 'user', content: text }];
-    
     try {
       const response = await fetch(`${this.baseURL}/v1/messages/count_tokens`, {
         method: 'POST',
@@ -33,7 +42,7 @@ export class AnthropicProvider {
         },
         body: JSON.stringify({
           model,
-          messages,
+          messages: [{ role: 'user', content: text }],
         } as AnthropicCountTokensRequest),
       });
 

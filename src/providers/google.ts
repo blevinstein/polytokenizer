@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { EmbeddingResult, EmbeddingProvider, TokenizerInterface, ProviderError } from '../types/index.js';
+import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
 const EMBEDDING_MODELS = [
   'gemini-embedding-exp-03-07', // 3072 dimensions, 8K input, experimental (Mar 2025)
@@ -7,7 +7,7 @@ const EMBEDDING_MODELS = [
   'embedding-001'               // 768 dimensions, legacy model
 ];
 
-export class GoogleProvider implements EmbeddingProvider {
+export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
   private client: GoogleGenerativeAI;
   
   readonly supportedModels = EMBEDDING_MODELS;

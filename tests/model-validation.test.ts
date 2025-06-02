@@ -4,30 +4,18 @@ import { embedText, countTokens } from '../src/index.js';
 describe('Model Validation', () => {
   describe('Embedding Model Validation', () => {
     it('should accept valid embedding models', async () => {
-      // These should either work (with API keys) or fail with API key errors (without API keys)
-      // We test that they don't fail with model validation errors
-      try {
-        await embedText('openai/text-embedding-3-small', 'test');
-        // If it succeeds, that's fine - we have API keys
-      } catch (error) {
-        // If it fails, it should be an API key error, not a model validation error
-        expect(error.message).not.toMatch(/does not support embedding functionality/);
-        expect(error.message).not.toMatch(/Invalid model format/);
-      }
-
-      try {
-        await embedText('google/text-embedding-004', 'test');
-      } catch (error) {
-        expect(error.message).not.toMatch(/does not support embedding functionality/);
-        expect(error.message).not.toMatch(/Invalid model format/);
-      }
-
-      try {
-        await embedText('google/gemini-embedding-exp-03-07', 'test');
-      } catch (error) {
-        expect(error.message).not.toMatch(/does not support embedding functionality/);
-        expect(error.message).not.toMatch(/Invalid model format/);
-      }
+      // These should work with proper API keys configured
+      const result1 = await embedText('openai/text-embedding-3-small', 'test');
+      expect(result1.vector).toBeDefined();
+      expect(Array.isArray(result1.vector)).toBe(true);
+      
+      const result2 = await embedText('google/text-embedding-004', 'test');
+      expect(result2.vector).toBeDefined();
+      expect(Array.isArray(result2.vector)).toBe(true);
+      
+      const result3 = await embedText('google/gemini-embedding-exp-03-07', 'test');
+      expect(result3.vector).toBeDefined();
+      expect(Array.isArray(result3.vector)).toBe(true);
     });
 
     it('should reject chat models for embeddings', async () => {
@@ -44,7 +32,7 @@ describe('Model Validation', () => {
 
   describe('Tokenization Model Validation', () => {
     it('should accept valid tokenization models', async () => {
-      // OpenAI tokenization works locally, so it should return a number
+      // These should work with proper API keys configured
       const openaiResult = await countTokens('openai/gpt-4o', 'test');
       expect(typeof openaiResult).toBe('number');
       expect(openaiResult).toBeGreaterThan(0);
@@ -53,34 +41,13 @@ describe('Model Validation', () => {
       expect(typeof openaiEmbedResult).toBe('number');
       expect(openaiEmbedResult).toBeGreaterThan(0);
 
-      // Anthropic models require API keys
-      try {
-        const anthropicResult = await countTokens('anthropic/claude-3-5-sonnet-latest', 'test');
-        expect(typeof anthropicResult).toBe('number');
-        expect(anthropicResult).toBeGreaterThan(0);
-      } catch (error) {
-        // If it fails, it should be an API key error, not a model validation error
-        expect(error.message).not.toMatch(/does not support tokenization functionality/);
-        expect(error.message).not.toMatch(/Invalid model format/);
-      }
+      const anthropicResult = await countTokens('anthropic/claude-3-5-sonnet-latest', 'test');
+      expect(typeof anthropicResult).toBe('number');
+      expect(anthropicResult).toBeGreaterThan(0);
 
-      try {
-        const googleResult = await countTokens('google/gemini-1.5-pro', 'test');
-        expect(typeof googleResult).toBe('number');
-        expect(googleResult).toBeGreaterThan(0);
-      } catch (error) {
-        expect(error.message).not.toMatch(/does not support tokenization functionality/);
-        expect(error.message).not.toMatch(/Invalid model format/);
-      }
-
-      try {
-        const googleEmbedResult = await countTokens('google/gemini-embedding-exp-03-07', 'test');
-        expect(typeof googleEmbedResult).toBe('number');
-        expect(googleEmbedResult).toBeGreaterThan(0);
-      } catch (error) {
-        expect(error.message).not.toMatch(/does not support tokenization functionality/);
-        expect(error.message).not.toMatch(/Invalid model format/);
-      }
+      const googleResult = await countTokens('google/gemini-1.5-pro', 'test');
+      expect(typeof googleResult).toBe('number');
+      expect(googleResult).toBeGreaterThan(0);
     });
 
     it('should reject unsupported models', async () => {
@@ -98,10 +65,9 @@ describe('Model Validation', () => {
     });
 
     it('should reject unsupported providers', async () => {
-      // Note: embedText() validates model capability first, so unsupported providers get model capability errors
+      // Both functions now check model capability which provides consistent error messages
       await expect(embedText('unsupported/model', 'test')).rejects.toThrow('does not support embedding functionality');
-      // countTokens() calls getProvider() first, so it gets the "Unsupported provider" error
-      await expect(countTokens('unsupported/model', 'test')).rejects.toThrow('Unsupported provider');
+      await expect(countTokens('unsupported/model', 'test')).rejects.toThrow('does not support tokenization functionality');
     });
   });
 }); 

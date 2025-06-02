@@ -1,6 +1,6 @@
 import { OpenAI } from 'openai';
 import { get_encoding, Tiktoken } from 'tiktoken';
-import type { EmbeddingResult, EmbeddingProvider, TokenizerInterface, ProviderError } from '../types/index.js';
+import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
 const EMBEDDING_MODELS = [
   'text-embedding-3-small',
@@ -14,7 +14,7 @@ const EMBEDDING_COSTS = {
   'text-embedding-ada-002': 0.1e-6,
 } as const;
 
-export class OpenAIProvider implements EmbeddingProvider {
+export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
   private client: OpenAI;
   private tokenizers = new Map<string, Tiktoken>();
   
@@ -59,6 +59,12 @@ export class OpenAIProvider implements EmbeddingProvider {
         error.status
       );
     }
+  }
+
+  async countTokens(model: string, text: string): Promise<number> {
+    const modelName = model.replace('openai/', '');
+    const tokenizer = this.getTokenizer(modelName);
+    return tokenizer.count(text);
   }
 
   getTokenizer(model?: string): TokenizerInterface {

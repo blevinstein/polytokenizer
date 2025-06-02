@@ -5,14 +5,16 @@ import { OpenAIProvider } from './providers/openai.js';
 import { AnthropicProvider } from './providers/anthropic.js';
 import { GoogleProvider } from './providers/google.js';
 import { VertexAIProvider } from './providers/vertex.js';
-import { EMBEDDING_MODELS, TOKENIZATION_MODELS } from './constants/models.js';
-import type { EmbeddingResult, LibraryConfig, Message, TruncateOptions, SplitTextOptions } from './types/index.js';
+import { EMBEDDING_MODELS, TOKENIZATION_MODELS, TOKENIZATION_PROVIDERS, EMBEDDING_PROVIDERS } from './constants/models.js';
+import type { EmbeddingResult, LibraryConfig, Message, TruncateOptions, SplitTextOptions, TokenizerProvider, EmbeddingProvider } from './types/index.js';
+
+type ProviderInstance = OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider;
 
 interface ProviderInstances {
-  openai?: OpenAIProvider;
-  anthropic?: AnthropicProvider;
-  google?: GoogleProvider;
-  vertex?: VertexAIProvider;
+  openai?: ProviderInstance;
+  anthropic?: ProviderInstance;
+  google?: ProviderInstance;
+  vertex?: ProviderInstance;
 }
 
 let config: LibraryConfig = {};
@@ -26,66 +28,101 @@ function parseModel(model: string): { provider: string; modelName: string } {
   return { provider: parts[0], modelName: parts[1] };
 }
 
+function supportsTokenization(provider: string, modelName: string): boolean {
+  const supportedModels = TOKENIZATION_MODELS[provider] || [];
+  return supportedModels.includes(modelName);
+}
+
+function supportsEmbedding(provider: string, modelName: string): boolean {
+  const supportedModels = EMBEDDING_MODELS[provider] || [];
+  return supportedModels.includes(modelName);
+}
+
 function validateModelCapability(provider: string, modelName: string, capability: 'embedding' | 'tokenization'): void {
-  const models = capability === 'embedding' ? EMBEDDING_MODELS : TOKENIZATION_MODELS;
-  const supportedModels = models[provider] || [];
+  const isSupported = capability === 'embedding' 
+    ? supportsEmbedding(provider, modelName)
+    : supportsTokenization(provider, modelName);
   
-  if (!supportedModels.includes(modelName)) {
+  if (!isSupported) {
     throw new Error(`Model ${provider}/${modelName} does not support ${capability} functionality`);
   }
 }
 
-function getProvider(providerName: string): OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider {
+function createProvider(providerName: string): OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider {
+  if (providerName === 'vertex') {
+    const vertexConfig = config.vertex;
+    if (!vertexConfig?.projectId) {
+      throw new Error(`Vertex AI configuration missing. Set projectId in configure() call.`);
+    }
+    return new VertexAIProvider(
+      vertexConfig.projectId,
+      vertexConfig.location,
+      vertexConfig.credentials
+    );
+  } else {
+    const providerConfig = config[providerName as 'openai' | 'anthropic' | 'google'];
+    
+    // Map provider names to their correct environment variable names
+    const envVarMap = {
+      'openai': 'OPENAI_API_KEY',
+      'anthropic': 'ANTHROPIC_API_KEY',
+      'google': 'GEMINI_API_KEY'
+    };
+    
+    const apiKey = providerConfig?.apiKey || process.env[envVarMap[providerName as keyof typeof envVarMap]];
+    
+    if (!apiKey) {
+      const envVarName = envVarMap[providerName as keyof typeof envVarMap];
+      throw new Error(`API key not found for provider ${providerName}. Set ${envVarName} environment variable or call configure().`);
+    }
+
+    switch (providerName) {
+      case 'openai':
+        return new OpenAIProvider(apiKey, providerConfig?.baseURL);
+      case 'anthropic':
+        return new AnthropicProvider(apiKey, providerConfig?.baseURL);
+      case 'google':
+        return new GoogleProvider(apiKey);
+      default:
+        throw new Error(`Unsupported provider: ${providerName}`);
+    }
+  }
+}
+
+function getTokenizerProvider(providerName: string): TokenizerProvider {
   // Check if provider is supported before checking API keys
-  if (!['openai', 'anthropic', 'google', 'vertex'].includes(providerName)) {
-    throw new Error(`Unsupported provider: ${providerName}`);
+  if (!TOKENIZATION_PROVIDERS.includes(providerName as any)) {
+    throw new Error(`Provider ${providerName} does not support tokenization`);
   }
 
   if (!providers[providerName as keyof ProviderInstances]) {
-    if (providerName === 'vertex') {
-      const vertexConfig = config.vertex;
-      if (!vertexConfig?.projectId) {
-        throw new Error(`Vertex AI configuration missing. Set projectId in configure() call.`);
-      }
-      providers.vertex = new VertexAIProvider(
-        vertexConfig.projectId,
-        vertexConfig.location,
-        vertexConfig.credentials
-      );
-    } else {
-      const providerConfig = config[providerName as 'openai' | 'anthropic' | 'google'];
-      
-      // Map provider names to their correct environment variable names
-      const envVarMap = {
-        'openai': 'OPENAI_API_KEY',
-        'anthropic': 'ANTHROPIC_API_KEY',
-        'google': 'GEMINI_API_KEY'
-      };
-      
-      const apiKey = providerConfig?.apiKey || process.env[envVarMap[providerName as keyof typeof envVarMap]];
-      
-      if (!apiKey) {
-        const envVarName = envVarMap[providerName as keyof typeof envVarMap];
-        throw new Error(`API key not found for provider ${providerName}. Set ${envVarName} environment variable or call configure().`);
-      }
-
-      switch (providerName) {
-        case 'openai':
-          providers.openai = new OpenAIProvider(apiKey, providerConfig?.baseURL);
-          break;
-        case 'anthropic':
-          providers.anthropic = new AnthropicProvider(apiKey, providerConfig?.baseURL);
-          break;
-        case 'google':
-          providers.google = new GoogleProvider(apiKey);
-          break;
-        default:
-          throw new Error(`Unsupported provider: ${providerName}`);
-      }
-    }
+    providers[providerName as keyof ProviderInstances] = createProvider(providerName);
   }
 
-  return providers[providerName as keyof ProviderInstances]!;
+  const provider = providers[providerName as keyof ProviderInstances];
+  if (!provider) {
+    throw new Error(`Failed to create provider: ${providerName}`);
+  }
+
+  return provider as TokenizerProvider;
+}
+
+function getEmbeddingProvider(providerName: string): EmbeddingProvider {
+  // Check if provider is supported before checking API keys
+  if (!EMBEDDING_PROVIDERS.includes(providerName as any)) {
+    throw new Error(`Provider ${providerName} does not support embeddings`);
+  }
+
+  if (!providers[providerName as keyof ProviderInstances]) {
+    providers[providerName as keyof ProviderInstances] = createProvider(providerName);
+  }
+
+  const provider = providers[providerName as keyof ProviderInstances];
+  if (!provider) {
+    throw new Error(`Failed to create provider: ${providerName}`);
+  }
+
+  return provider as EmbeddingProvider;
 }
 
 export function configure(newConfig: LibraryConfig): void {
@@ -96,35 +133,23 @@ export function configure(newConfig: LibraryConfig): void {
 export async function embedText(model: string, text: string): Promise<EmbeddingResult> {
   const { provider, modelName } = parseModel(model);
   
-  // Validate that the model supports embeddings
+  // Validate that the model supports embeddings (this implicitly validates provider support too)
   validateModelCapability(provider, modelName, 'embedding');
   
-  const providerInstance = getProvider(provider);
-  
-  if (!('embed' in providerInstance)) {
-    throw new Error(`Provider ${provider} does not support embeddings`);
-  }
+  const providerInstance = getEmbeddingProvider(provider);
   
   return providerInstance.embed(text, modelName);
 }
 
 export async function countTokens(model: string, text: string): Promise<number> {
   const { provider, modelName } = parseModel(model);
-  const providerInstance = getProvider(provider);
   
-  // Validate that the model supports tokenization
+  // Validate that the model supports tokenization (this implicitly validates provider support too)
   validateModelCapability(provider, modelName, 'tokenization');
   
-  if (provider === 'openai' && providerInstance instanceof OpenAIProvider) {
-    const tokenizer = providerInstance.getTokenizer(modelName);
-    return tokenizer.count(text);
-  } else if (provider === 'anthropic' && providerInstance instanceof AnthropicProvider) {
-    return providerInstance.countTokens(modelName, text);
-  } else if (provider === 'google' && providerInstance instanceof GoogleProvider) {
-    return providerInstance.countTokens(modelName, text);
-  }
+  const providerInstance = getTokenizerProvider(provider);
   
-  throw new Error(`Token counting not supported for provider: ${provider}`);
+  return providerInstance.countTokens(modelName, text);
 }
 
 export async function splitTextMaxTokens(model: string, text: string, maxTokens: number, options: SplitTextOptions = {}): Promise<string[]> {

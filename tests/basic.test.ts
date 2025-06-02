@@ -67,7 +67,7 @@ describe('PolyTokenizer Core', () => {
 
   describe('Error handling', () => {
     it('should throw error for unsupported provider', async () => {
-      await expect(countTokens('unsupported/model', 'test')).rejects.toThrow('Unsupported provider');
+      await expect(countTokens('unsupported/model', 'test')).rejects.toThrow('does not support tokenization functionality');
     });
 
     it('should throw error for invalid model format', async () => {

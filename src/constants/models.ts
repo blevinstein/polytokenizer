@@ -108,4 +108,14 @@ export const TOKENIZATION_MODELS: Record<string, string[]> = {
   ]
 };
 
+/**
+ * Provider capability constants
+ * These define which providers support which capabilities
+ */
+export const TOKENIZATION_PROVIDERS = ['openai', 'anthropic', 'google'] as const;
+export const EMBEDDING_PROVIDERS = ['openai', 'google', 'vertex'] as const;
+
+export type TokenizationProvider = typeof TOKENIZATION_PROVIDERS[number];
+export type EmbeddingProvider = typeof EMBEDDING_PROVIDERS[number];
+
 export type SupportedModel = keyof typeof CONTEXT_LIMITS; 
