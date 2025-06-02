@@ -1,5 +1,6 @@
 /// <reference types="node" />
 
+import async from 'async';
 import { OpenAIProvider } from './providers/openai.js';
 import { AnthropicProvider } from './providers/anthropic.js';
 import { GoogleProvider } from './providers/google.js';
@@ -127,6 +128,8 @@ export async function countTokens(model: string, text: string): Promise<number> 
 }
 
 export async function splitTextMaxTokens(model: string, text: string, maxTokens: number, options: SplitTextOptions = {}): Promise<string[]> {
+  const { preserveSentences = true, preserveWords = true } = options;
+
   if (!text || maxTokens <= 0) {
     return text ? [text] : [];
   }
@@ -135,28 +138,23 @@ export async function splitTextMaxTokens(model: string, text: string, maxTokens:
   if (tokenCount <= maxTokens) {
     return [text];
   }
-
-  const { preserveSentences = true, preserveWords = true } = options;
   let parts = [{ text, tokens: tokenCount }];
 
   const splitters = [];
   if (preserveSentences) splitters.push(/\n+/g, /(?<=\w[.?!])\s+/g);
   if (preserveWords) splitters.push(/\s+/g);
 
+  // Splitters are used in order (earlier splitters are preferred)
   for (const splitter of splitters) {
-    parts = await Promise.all(
-      parts.flatMap(async (part) => {
+    parts = await async.flatMap(parts, async (part: { text: string; tokens: number }) => {
+        // Parts which are already under max tokens are returned as-is
         if (part.tokens <= maxTokens) return [part];
         
-        const segments = part.text.split(splitter);
-        const segmentParts = [];
-        for (const segment of segments) {
-          const segmentTokens = await countTokens(model, segment);
-          segmentParts.push({ text: segment, tokens: segmentTokens });
-        }
-        return segmentParts;
-      })
-    ).then(results => results.flat());
+        // Split larger part into segments and count the tokens for each segment
+        return await async.map(
+            part.text.split(splitter),
+            async (segment: string) => ({ text: segment, tokens: await countTokens(model, segment) }));
+      });
   }
 
   const oversizedParts = parts.filter(p => p.tokens > maxTokens);
@@ -193,14 +191,12 @@ export async function trimMessages(messages: Message[], model: string, maxTokens
   
   if (messages.length === 0) return [];
 
-  let totalTokens = 0;
-  const messageTokens: { message: Message; tokens: number }[] = [];
-  
-  for (const message of messages) {
+  const messageTokens = await async.map(messages, async (message: Message) => {
     const tokens = await countTokens(model, message.content);
-    messageTokens.push({ message, tokens });
-    totalTokens += tokens;
-  }
+    return { message, tokens };
+  });
+
+  const totalTokens = messageTokens.reduce((sum, m) => sum + m.tokens, 0);
 
   if (totalTokens <= maxTokens) {
     return messages;

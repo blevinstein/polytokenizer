@@ -38,11 +38,13 @@
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.19.0",
+    "async": "^3.2.6",
     "google-auth-library": "^9.15.1",
     "openai": "^4.67.3",
     "tiktoken": "^1.0.17"
   },
   "devDependencies": {
+    "@types/async": "^3.2.24",
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",

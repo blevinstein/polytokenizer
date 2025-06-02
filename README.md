@@ -316,11 +316,3 @@ const trimmed = await trimMessages(messages, 'openai/gpt-4o', 4000, {
 - `vertex/text-multilingual-embedding-002` - 768 dimensions (2K context) - $0.00002/1K chars - Multilingual
 
 *Note: Vertex AI models support embeddings only (no tokenization capabilities). Vertex AI provides the most cost-effective embedding options.*
-
-## Contributing
-
-We welcome contributions! Please see our contributing guidelines for details.
-
-## License
-
-MIT License - see LICENSE file for details.
