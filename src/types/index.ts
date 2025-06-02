@@ -102,6 +102,5 @@ export interface ProviderError extends Error {
 
 // Import model constants from the consolidated constants file
 export { 
-  CONTEXT_LIMITS, 
-  type SupportedModel
+  CONTEXT_LIMITS
 } from '../constants/models.js'; 

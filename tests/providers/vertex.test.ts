@@ -60,7 +60,7 @@ describe('VertexAIProvider', () => {
 
       it('should handle authentication errors gracefully', async () => {
         // Provider with mock credentials should fail authentication
-        await expect(provider.embed('test text', 'vertex/text-embedding-005'))
+        await expect(provider.embed('test text', 'text-embedding-005'))
           .rejects
           .toThrow(/Vertex AI embedding failed/);
       });

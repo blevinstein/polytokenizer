@@ -9,104 +9,89 @@
  * - Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
  * - Google Gemini: https://ai.google.dev/gemini-api/docs/models
  * - Vertex AI: https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings
+ * - Vertex AI: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings-api
  */
 
 export const CONTEXT_LIMITS = {
   // OpenAI - Latest models
-  'gpt-4.1': 1_000_000,
-  'gpt-4.1-mini': 1_000_000,
-  'o4-mini': 200_000,
-  'o3': 200_000,
-  'o1': 200_000,
-  'o1-preview': 128_000,
-  'o1-mini': 128_000,
-  'gpt-4o': 128_000,
-  'gpt-4o-mini': 128_000,
+  'openai/gpt-4.1': 1_000_000,
+  'openai/gpt-4.1-mini': 1_000_000,
+  'openai/o4-mini': 200_000,
+  'openai/o3': 200_000,
+  'openai/o1': 200_000,
+  'openai/o1-preview': 128_000,
+  'openai/o1-mini': 128_000,
+  'openai/gpt-4o': 128_000,
+  'openai/gpt-4o-mini': 128_000,
   
   // OpenAI - Older models
-  'gpt-4': 8_192,
-  'gpt-4-turbo': 128_000,
-  'gpt-3.5-turbo': 16_385,
+  'openai/gpt-4': 8_192,
+  'openai/gpt-4-turbo': 128_000,
+  'openai/gpt-3.5-turbo': 16_385,
   
   // Anthropic - Claude 4 series (using official aliases)
-  'claude-opus-4-0': 200_000,
-  'claude-sonnet-4-0': 200_000,
+  'anthropic/claude-opus-4-0': 200_000,
+  'anthropic/claude-sonnet-4-0': 200_000,
   
   // Anthropic - Claude 3 series (using official aliases)
-  'claude-3-7-sonnet-latest': 200_000,
-  'claude-3-5-sonnet-latest': 200_000,
-  'claude-3-5-haiku-latest': 200_000,
-  'claude-3-opus-latest': 200_000,
+  'anthropic/claude-3-7-sonnet-latest': 200_000,
+  'anthropic/claude-3-5-sonnet-latest': 200_000,
+  'anthropic/claude-3-5-haiku-latest': 200_000,
+  'anthropic/claude-3-opus-latest': 200_000,
   
   // Google - Latest models
-  'gemini-2.5-pro': 2_000_000,
-  'gemini-2.5-flash': 1_000_000,
-  'gemini-2.0-flash': 1_000_000,
-  'gemini-1.5-pro': 2_000_000,
-  'gemini-1.5-flash': 1_000_000,
-  'gemini-1.5-flash-8b': 1_000_000,
-  'gemini-pro': 32_768,
-  
-  // OpenAI Embedding models
-  'text-embedding-3-small': 8_192,
-  'text-embedding-3-large': 8_192,
-  'text-embedding-ada-002': 8_192,
-  
-  // Google Embedding models
-  'gemini-embedding-exp-03-07': 8_192,
-  'text-embedding-004': 2_048,
-  'embedding-001': 2_048,
-  
-  // Vertex AI Embedding models
-  'text-embedding-005': 2_048,
-  'text-multilingual-embedding-002': 2_048,
+  'google/gemini-2.5-pro': 2_000_000,
+  'google/gemini-2.5-flash': 1_000_000,
+  'google/gemini-2.0-flash': 1_000_000,
+  'google/gemini-1.5-pro': 2_000_000,
+  'google/gemini-1.5-flash': 1_000_000,
+  'google/gemini-1.5-flash-8b': 1_000_000,
+  'google/gemini-pro': 32_768,
 } as const;
 
-export const EMBEDDING_MODELS: Record<string, string[]> = {
-  openai: [
-    'text-embedding-3-small', 
-    'text-embedding-3-large', 
-    'text-embedding-ada-002'
-  ],
-  google: [
-    'gemini-embedding-exp-03-07', 
-    'text-embedding-004', 
-    'embedding-001'
-  ],
-  vertex: [
-    'text-embedding-005',
-    'text-embedding-004',
-    'text-multilingual-embedding-002'
-  ],
-  anthropic: [] // Anthropic doesn't have public embedding API
-};
+export const EMBEDDING_MODELS = [
+  // OpenAI Embedding models
+  'openai/text-embedding-3-small', 
+  'openai/text-embedding-3-large', 
+  'openai/text-embedding-ada-002',
+  
+  // Google Embedding models (Gemini API)
+  'google/gemini-embedding-exp-03-07', 
+  'google/text-embedding-004', 
+  'google/gemini-embedding-001',
+  
+  // Vertex AI Embedding models
+  'vertex/text-embedding-005',
+  'vertex/text-embedding-004',
+  'vertex/text-multilingual-embedding-002',
+] as const;
 
-export const TOKENIZATION_MODELS: Record<string, string[]> = {
-  openai: [
-    // Latest models (o200k_base tokenizer)
-    'gpt-4.1', 'gpt-4.1-mini', 'o4-mini', 'o3', 'o1', 'o1-preview', 'o1-mini', 
-    'gpt-4o', 'gpt-4o-mini',
-    // Older models (cl100k_base tokenizer)
-    'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo',
-    // Embedding models (cl100k_base tokenizer)
-    'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002'
-  ],
-  anthropic: [
-    // Claude 4 series (using official aliases)
-    'claude-opus-4-0', 'claude-sonnet-4-0',
-    // Claude 3 series (using official aliases)
-    'claude-3-7-sonnet-latest', 'claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest',
-    'claude-3-opus-latest'
-  ],
-  google: [
-    // Latest Gemini chat models
-    'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash', 
-    'gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b',
-    'gemini-pro',
-    // Embedding models
-    'gemini-embedding-exp-03-07', 'text-embedding-004', 'embedding-001'
-  ]
-};
+export const TOKENIZATION_MODELS = [
+  // OpenAI - Latest models (o200k_base tokenizer)
+  'openai/gpt-4.1', 'openai/gpt-4.1-mini', 'openai/o4-mini', 'openai/o3', 'openai/o1', 'openai/o1-preview', 'openai/o1-mini', 
+  'openai/gpt-4o', 'openai/gpt-4o-mini',
+  
+  // OpenAI - Older models (cl100k_base tokenizer)
+  'openai/gpt-4', 'openai/gpt-4-turbo', 'openai/gpt-3.5-turbo',
+  
+  // OpenAI - Embedding models (cl100k_base tokenizer)
+  'openai/text-embedding-3-small', 'openai/text-embedding-3-large', 'openai/text-embedding-ada-002',
+  
+  // Anthropic - Claude 4 series (using official aliases)
+  'anthropic/claude-opus-4-0', 'anthropic/claude-sonnet-4-0',
+  
+  // Anthropic - Claude 3 series (using official aliases)
+  'anthropic/claude-3-7-sonnet-latest', 'anthropic/claude-3-5-sonnet-latest', 'anthropic/claude-3-5-haiku-latest',
+  'anthropic/claude-3-opus-latest',
+  
+  // Google - Latest Gemini chat models
+  'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.0-flash', 
+  'google/gemini-1.5-pro', 'google/gemini-1.5-flash', 'google/gemini-1.5-flash-8b',
+  'google/gemini-pro',
+  
+  // Google - Embedding models
+  'google/gemini-embedding-exp-03-07', 'google/text-embedding-004', 'google/gemini-embedding-001',
+] as const;
 
 /**
  * Provider capability constants
@@ -118,4 +103,24 @@ export const EMBEDDING_PROVIDERS = ['openai', 'google', 'vertex'] as const;
 export type TokenizationProvider = typeof TOKENIZATION_PROVIDERS[number];
 export type EmbeddingProvider = typeof EMBEDDING_PROVIDERS[number];
 
-export type SupportedModel = keyof typeof CONTEXT_LIMITS; 
+export const EMBEDDING_LIMITS = {
+  // OpenAI Embedding models
+  'openai/text-embedding-3-small': 8_192,
+  'openai/text-embedding-3-large': 8_192,
+  'openai/text-embedding-ada-002': 8_192,
+  
+  // Google Embedding models (Gemini API)
+  'google/gemini-embedding-exp-03-07': 8_192,
+  'google/text-embedding-004': 2_048,
+  'google/gemini-embedding-001': 2_048,
+  
+  // Vertex AI Embedding models
+  'vertex/text-embedding-005': 2_048,
+  'vertex/text-embedding-004': 2_048,
+  'vertex/text-multilingual-embedding-002': 2_048,
+} as const;
+
+export type SupportedModel = keyof typeof CONTEXT_LIMITS;
+export type SupportedEmbeddingModel = keyof typeof EMBEDDING_LIMITS;
+export type SupportedTokenizationModel = typeof TOKENIZATION_MODELS[number];
+export type SupportedEmbeddingModelName = typeof EMBEDDING_MODELS[number];

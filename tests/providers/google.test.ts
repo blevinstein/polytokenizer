@@ -78,7 +78,7 @@ describe('GoogleProvider', () => {
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
         expect(result.vector.length).toBe(3072); // New model has 3072 dimensions
-        expect(result.model).toBe('gemini-embedding-exp-03-07');
+        expect(result.model).toBe('google/gemini-embedding-exp-03-07');
         expect(result.usage.tokens).toBeGreaterThan(0);
         
         // Check that vector contains numbers
@@ -91,7 +91,7 @@ describe('GoogleProvider', () => {
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
         expect(result.vector.length).toBe(768); // text-embedding-004 dimension
-        expect(result.model).toBe('text-embedding-004');
+        expect(result.model).toBe('google/text-embedding-004');
         expect(result.usage.tokens).toBeGreaterThan(0);
       });
 

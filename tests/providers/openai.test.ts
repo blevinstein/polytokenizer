@@ -124,7 +124,7 @@ describe('OpenAIProvider', () => {
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
         expect(result.vector.length).toBe(1536); // text-embedding-3-small dimension
-        expect(result.model).toBe('text-embedding-3-small');
+        expect(result.model).toBe('openai/text-embedding-3-small');
         expect(result.usage.tokens).toBeGreaterThan(0);
         expect(typeof result.usage.cost).toBe('number');
         
@@ -138,7 +138,7 @@ describe('OpenAIProvider', () => {
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
         expect(result.vector.length).toBe(3072); // text-embedding-3-large dimension
-        expect(result.model).toBe('text-embedding-3-large');
+        expect(result.model).toBe('openai/text-embedding-3-large');
         expect(result.usage.tokens).toBeGreaterThan(0);
       });
 

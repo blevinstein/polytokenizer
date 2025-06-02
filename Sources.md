@@ -189,7 +189,7 @@ This file documents URLs and sources for AI model capabilities, pricing, context
   - **Unified Model**: Surpasses previous task-specific models
   - **Status**: Experimental with limited capacity, subject to change
 - `text-embedding-004`: 768 dimensions
-- `embedding-001`: 768 dimensions (legacy)
+- `gemini-embedding-001`: 768 dimensions (legacy)
 
 **Notes on Vertex AI vs Direct API:**
 - **Vertex AI** offers additional specialized embedding models (`text-embedding-005`, `text-multilingual-embedding-002`)
@@ -205,15 +205,15 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 **Implementation Status**: ✅ **Fully Implemented** (`src/providers/vertex.ts`)
 
 **Primary Sources:**
-- Vertex AI Embeddings: https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings
+- Vertex AI Embeddings: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings-api
 - Vertex AI Pricing: https://cloud.google.com/vertex-ai/generative-ai/pricing
 - Vertex AI Models: https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
 
 **Current Models (as of May 2025):**
 
-**Embedding Models (Vertex AI Exclusive):**
+**Embedding Models (Vertex AI):**
 - `text-embedding-005`: 768 dimensions, 2048 tokens, English/code specialized, $0.00002/1K characters
-- `text-embedding-004`: 768 dimensions, 2048 tokens, general purpose, $0.00002/1K characters
+- `text-embedding-004`: 768 dimensions, 2048 tokens, general purpose, $0.00002/1K characters (also available via Google Gemini API)
 - `text-multilingual-embedding-002`: 768 dimensions, 2048 tokens, multilingual, $0.00002/1K characters
 
 **Key Differences from Direct Gemini API:**

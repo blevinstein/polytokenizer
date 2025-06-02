@@ -5,7 +5,7 @@ import { OpenAIProvider } from './providers/openai.js';
 import { AnthropicProvider } from './providers/anthropic.js';
 import { GoogleProvider } from './providers/google.js';
 import { VertexAIProvider } from './providers/vertex.js';
-import { EMBEDDING_MODELS, TOKENIZATION_MODELS, TOKENIZATION_PROVIDERS, EMBEDDING_PROVIDERS } from './constants/models.js';
+import { EMBEDDING_MODELS, TOKENIZATION_MODELS, TOKENIZATION_PROVIDERS, EMBEDDING_PROVIDERS, EMBEDDING_LIMITS, CONTEXT_LIMITS } from './constants/models.js';
 import type { EmbeddingResult, LibraryConfig, Message, TruncateOptions, SplitTextOptions, TokenizerProvider, EmbeddingProvider } from './types/index.js';
 
 type ProviderInstance = OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider;
@@ -26,26 +26,6 @@ function parseModel(model: string): { provider: string; modelName: string } {
     throw new Error(`Invalid model format: ${model}. Expected format: provider/model`);
   }
   return { provider: parts[0], modelName: parts[1] };
-}
-
-function supportsTokenization(provider: string, modelName: string): boolean {
-  const supportedModels = TOKENIZATION_MODELS[provider] || [];
-  return supportedModels.includes(modelName);
-}
-
-function supportsEmbedding(provider: string, modelName: string): boolean {
-  const supportedModels = EMBEDDING_MODELS[provider] || [];
-  return supportedModels.includes(modelName);
-}
-
-function validateModelCapability(provider: string, modelName: string, capability: 'embedding' | 'tokenization'): void {
-  const isSupported = capability === 'embedding' 
-    ? supportsEmbedding(provider, modelName)
-    : supportsTokenization(provider, modelName);
-  
-  if (!isSupported) {
-    throw new Error(`Model ${provider}/${modelName} does not support ${capability} functionality`);
-  }
 }
 
 function createProvider(providerName: string): OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider {
@@ -131,9 +111,11 @@ export function configure(newConfig: LibraryConfig): void {
 }
 
 export async function embedText(model: string, text: string): Promise<EmbeddingResult> {
-  const { provider, modelName } = parseModel(model);
+  const { provider, modelName } = parseModel(model); // This throws format error if invalid
   
-  validateModelCapability(provider, modelName, 'embedding');
+  if (!EMBEDDING_MODELS.includes(model as any)) {
+    throw new Error(`Model ${model} does not support embedding functionality`);
+  }
   
   const providerInstance = getEmbeddingProvider(provider);
   
@@ -141,9 +123,11 @@ export async function embedText(model: string, text: string): Promise<EmbeddingR
 }
 
 export async function countTokens(model: string, text: string): Promise<number> {
-  const { provider, modelName } = parseModel(model);
+  const { provider, modelName } = parseModel(model); // This throws format error if invalid
   
-  validateModelCapability(provider, modelName, 'tokenization');
+  if (!TOKENIZATION_MODELS.includes(model as any)) {
+    throw new Error(`Model ${model} does not support tokenization functionality`);
+  }
   
   const providerInstance = getTokenizerProvider(provider);
   
@@ -280,4 +264,6 @@ export async function trimMessages(messages: Message[], model: string, maxTokens
   });
 
   return result.map(m => m.message);
-} 
+}
+
+export { EMBEDDING_LIMITS, CONTEXT_LIMITS }; 

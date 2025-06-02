@@ -52,10 +52,7 @@ export class VertexAIProvider implements EmbeddingProvider {
   }
 
   async embed(text: string, model: string): Promise<EmbeddingResult> {
-    // Remove 'vertex/' prefix if present
-    const modelName = model.replace('vertex/', '');
-    
-    if (!this.supportedModels.includes(modelName)) {
+    if (!this.supportedModels.includes(model)) {
       throw new Error(`Model ${model} is not supported by Vertex AI provider`);
     }
 
@@ -69,7 +66,7 @@ export class VertexAIProvider implements EmbeddingProvider {
         throw new Error('Failed to get access token');
       }
 
-      const endpoint = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/${modelName}:predict`;
+      const endpoint = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/${model}:predict`;
 
       const requestBody: VertexAIPredictRequest = {
         instances: [
@@ -107,11 +104,11 @@ export class VertexAIProvider implements EmbeddingProvider {
 
       // Calculate usage and cost
       const tokens = Math.ceil(text.length / 4); // Rough estimate: 4 chars per token
-      const cost = text.length * (EMBEDDING_COSTS[modelName as keyof typeof EMBEDDING_COSTS] || 0);
+      const cost = text.length * (EMBEDDING_COSTS[model as keyof typeof EMBEDDING_COSTS] || 0);
 
       return {
         vector: embedding.embeddings.values,
-        model: `vertex/${modelName}`,
+        model: `vertex/${model}`,
         usage: {
           tokens,
           cost
