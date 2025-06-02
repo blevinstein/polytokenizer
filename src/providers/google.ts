@@ -75,10 +75,6 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
     };
   }
 
-  private estimateTokens(text: string): number {
-    return Math.ceil(text.length / 4);
-  }
-
   private createError(code: string, message: string, statusCode?: number): ProviderError {
     const error = new Error(message) as ProviderError;
     error.code = code;
