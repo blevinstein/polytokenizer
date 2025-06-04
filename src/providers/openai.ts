@@ -1,5 +1,5 @@
 import { OpenAI } from 'openai';
-import { get_encoding, Tiktoken } from 'tiktoken';
+import { getEncoding, Tiktoken } from 'js-tiktoken';
 import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
 const EMBEDDING_MODELS = [
@@ -69,15 +69,15 @@ export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
     const encoding = this.getEncodingForModel(model);
     
     if (!this.tokenizers.has(encoding)) {
-      this.tokenizers.set(encoding, get_encoding(encoding));
+      this.tokenizers.set(encoding, getEncoding(encoding));
     }
     
     const tokenizer = this.tokenizers.get(encoding)!;
     
     return {
       count: (text: string) => tokenizer.encode(text).length,
-      encode: (text: string) => Array.from(tokenizer.encode(text)),
-      decode: (tokens: number[]) => new TextDecoder().decode(tokenizer.decode(new Uint32Array(tokens))),
+      encode: (text: string) => tokenizer.encode(text),
+      decode: (tokens: number[]) => tokenizer.decode(tokens),
     };
   }
 
@@ -125,9 +125,6 @@ export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
   }
 
   dispose(): void {
-    for (const tokenizer of this.tokenizers.values()) {
-      tokenizer.free();
-    }
     this.tokenizers.clear();
   }
 } 

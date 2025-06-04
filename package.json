@@ -1,6 +1,6 @@
 {
   "name": "polytokenizer",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A lightweight, multi-provider Node.js library for text tokenization, embedding, and context management",
   "main": "dist/index.js",
   "type": "module",
@@ -40,8 +40,8 @@
     "@google/generative-ai": "^0.19.0",
     "async": "^3.2.6",
     "google-auth-library": "^9.15.1",
-    "openai": "^4.67.3",
-    "tiktoken": "^1.0.17"
+    "js-tiktoken": "^1.0.20",
+    "openai": "^4.67.3"
   },
   "devDependencies": {
     "@types/async": "^3.2.24",
@@ -66,5 +66,6 @@
     "dist",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
