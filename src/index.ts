@@ -134,6 +134,15 @@ export async function countTokens(model: string, text: string): Promise<number> 
   return providerInstance.countTokens(modelName, text);
 }
 
+export async function tryCountTokens(model: string, text: string): Promise<number> {
+  try {
+    return await countTokens(model, text);
+  } catch (error) {
+    console.error(error);
+    return estimateTokens(text);
+  }
+}
+
 function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
@@ -149,7 +158,7 @@ export async function splitTextMaxTokens(text: string, model: string, maxTokens:
     return [text];
   }
 
-  const tokenCount = await countTokens(model, text);
+  const tokenCount = await tryCountTokens(model, text);
   if (tokenCount <= maxTokens) {
     return [text];
   }
@@ -168,7 +177,7 @@ export async function splitTextMaxTokens(text: string, model: string, maxTokens:
         // Split larger part into segments and count the tokens for each segment
         return await async.map(
             part.text.split(splitter),
-            async (segment: string) => ({ text: segment, tokens: await countTokens(model, segment) }));
+            async (segment: string) => ({ text: segment, tokens: await tryCountTokens(model, segment) }));
       });
   }
 
@@ -211,7 +220,7 @@ export async function trimMessages(messages: Message[], model: string, maxTokens
   const extraTokensTotal = 2;
 
   const messageTokens = await async.map(messages, async (message: Message) => {
-    const contentTokens = await countTokens(model, message.content);
+    const contentTokens = await tryCountTokens(model, message.content);
     const totalTokens = contentTokens + extraTokensPerMessage;
     return { message, tokens: totalTokens };
   });
