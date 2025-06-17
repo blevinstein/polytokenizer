@@ -119,6 +119,38 @@ describe('AnthropicProvider', () => {
           configure({ anthropic: { apiKey: process.env.ANTHROPIC_API_KEY! } });
         }
       });
+
+      it.skipIf(!hasApiKey)('should handle large payloads and find failure point above 10k tokens', async () => {
+        // Base text pattern to repeat for generating large payloads
+        const baseText = 'This is a sample sentence with various words and punctuation marks. ';
+        
+        let lastSuccessfulSize = 0;
+        let currentMultiplier = 1_000;
+        
+        while (true) {
+          const testText = baseText.repeat(currentMultiplier);
+          
+          try {
+            const count = await countTokens('anthropic/claude-3-5-sonnet-latest', testText);
+            expect(typeof count).toBe('number');
+            expect(count).toBeGreaterThan(0);
+            
+            lastSuccessfulSize = count;
+            currentMultiplier *= 10;
+          } catch (error) {
+            if (error.statusCode === 413) {
+              break;
+            } else {
+              throw error;
+            }
+          }
+        }
+        
+        // Assert that we can handle payloads with at least 10k tokens
+        expect(lastSuccessfulSize).toBeGreaterThan(10000);
+        
+        console.log(`Maximum successful payload size: ${lastSuccessfulSize} tokens`);
+      }, 300_000); // Increase timeout to 5min for this test
     });
   });
 }); 
