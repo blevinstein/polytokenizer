@@ -10,13 +10,6 @@ describe('OpenAIProvider', () => {
   });
 
   describe('Unit Tests', () => {
-    describe('Supported Models', () => {
-      it('should have supported models', () => {
-        expect(provider.supportedModels).toBeDefined();
-        expect(Array.isArray(provider.supportedModels)).toBe(true);
-      });
-    });
-
     describe('Tokenizer Support', () => {
       it('should provide local tokenization', () => {
         const tokenizer = provider.getTokenizer('test-model');
@@ -67,7 +60,6 @@ describe('OpenAIProvider', () => {
       it('should create provider instance', () => {
         const testProvider = new OpenAIProvider('test-api-key', 'https://custom.url');
         expect(testProvider).toBeInstanceOf(OpenAIProvider);
-        expect(testProvider.supportedModels).toBeDefined();
       });
     });
 

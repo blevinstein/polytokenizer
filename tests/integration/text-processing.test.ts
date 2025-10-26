@@ -37,8 +37,8 @@ describe('Text Processing Integration', () => {
 
     it.skipIf(!hasGoogleKey)('should work with Google models', async () => {
       const text = 'Test sentence for splitting with Google models and API integration.';
-      const chunks = await splitTextMaxTokens(text, 'google/gemini-1.5-pro', 10);
-      
+      const chunks = await splitTextMaxTokens(text, 'google/gemini-2.5-flash', 10);
+
       expect(chunks.length).toBeGreaterThanOrEqual(1);
       expect(chunks.join(' ')).toContain('Test');
       expect(chunks.join(' ')).toContain('sentence');
@@ -134,8 +134,8 @@ describe('Text Processing Integration', () => {
         { role: 'user' as const, content: 'Hello' },
         { role: 'assistant' as const, content: 'Hi' },
       ];
-      
-      const trimmed = await trimMessages(simpleMessages, 'google/gemini-1.5-pro', 5);
+
+      const trimmed = await trimMessages(simpleMessages, 'google/gemini-2.5-flash', 5);
       expect(trimmed.length).toBeGreaterThanOrEqual(0);
     });
 

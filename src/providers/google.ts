@@ -7,17 +7,23 @@ const EMBEDDING_MODELS = [
   'embedding-001'               // 768 dimensions, legacy model
 ];
 
+const CHAT_MODELS = [
+  'gemini-2.5-flash',           // Current flash model (2025)
+  'gemini-2.5-flash-lite',      // Lite flash model
+  'gemini-2.5-pro',             // Pro model
+  'gemini-2.0-flash',           // Previous generation flash
+  'gemini-2.0-flash-lite',      // Previous generation lite
+];
+
 export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
   private client: GoogleGenerativeAI;
-  
-  readonly supportedModels = EMBEDDING_MODELS;
 
   constructor(apiKey: string) {
     this.client = new GoogleGenerativeAI(apiKey);
   }
 
   async embed(text: string, model: string): Promise<EmbeddingResult> {
-    if (!this.supportedModels.includes(model)) {
+    if (!EMBEDDING_MODELS.includes(model)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }
 

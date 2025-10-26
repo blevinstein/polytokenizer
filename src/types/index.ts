@@ -85,12 +85,10 @@ export interface TokenizerInterface {
 export interface TokenizerProvider {
   countTokens(model: string, text: string): Promise<number>;
   getTokenizer(model: string): TokenizerInterface;
-  supportedModels: string[];
 }
 
 export interface EmbeddingProvider {
   embed(text: string, model: string): Promise<EmbeddingResult>;
-  supportedModels: string[];
 }
 
 export interface ProviderError extends Error {

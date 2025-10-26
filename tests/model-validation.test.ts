@@ -20,7 +20,7 @@ describe('Model Validation', () => {
 
     it('should reject chat models for embeddings', async () => {
       await expect(embedText('openai/gpt-4o', 'test')).rejects.toThrow('does not support embedding functionality');
-      await expect(embedText('google/gemini-1.5-pro', 'test')).rejects.toThrow('does not support embedding functionality');
+      await expect(embedText('google/gemini-2.5-pro', 'test')).rejects.toThrow('does not support embedding functionality');
       await expect(embedText('anthropic/claude-3-5-sonnet-latest', 'test')).rejects.toThrow('does not support embedding functionality');
     });
 
@@ -45,16 +45,16 @@ describe('Model Validation', () => {
       expect(typeof anthropicResult).toBe('number');
       expect(anthropicResult).toBeGreaterThan(0);
 
-      const googleResult = await countTokens('google/gemini-1.5-pro', 'test');
+      const googleResult = await countTokens('google/gemini-2.5-flash', 'test');
       expect(typeof googleResult).toBe('number');
       expect(googleResult).toBeGreaterThan(0);
     });
 
     it('should reject unsupported models', async () => {
       // These should fail with model validation errors, not API key errors
-      await expect(countTokens('openai/unsupported-model', 'test')).rejects.toThrow('does not support tokenization functionality');
-      await expect(countTokens('anthropic/unsupported-model', 'test')).rejects.toThrow('does not support tokenization functionality');
-      await expect(countTokens('google/unsupported-model', 'test')).rejects.toThrow('does not support tokenization functionality');
+      await expect(countTokens('unsupported-provider/model', 'test')).rejects.toThrow('does not support tokenization functionality');
+      await expect(countTokens('fake-provider/some-model', 'test')).rejects.toThrow('does not support tokenization functionality');
+      await expect(countTokens('invalid/test-model', 'test')).rejects.toThrow('does not support tokenization functionality');
     });
   });
 

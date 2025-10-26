@@ -47,12 +47,8 @@ export class VertexAIProvider implements EmbeddingProvider {
     });
   }
 
-  get supportedModels(): string[] {
-    return EMBEDDING_MODELS;
-  }
-
   async embed(text: string, model: string): Promise<EmbeddingResult> {
-    if (!this.supportedModels.includes(model)) {
+    if (!EMBEDDING_MODELS.includes(model)) {
       throw new Error(`Model ${model} is not supported by Vertex AI provider`);
     }
 

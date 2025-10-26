@@ -24,8 +24,6 @@ export class AnthropicProvider implements TokenizerProvider {
   private apiKey: string;
   private baseURL: string;
 
-  readonly supportedModels = SUPPORTED_MODELS;
-
   constructor(apiKey: string, baseURL = 'https://api.anthropic.com') {
     this.apiKey = apiKey;
     this.baseURL = baseURL;

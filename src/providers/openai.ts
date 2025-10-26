@@ -17,8 +17,6 @@ const EMBEDDING_COSTS = {
 export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
   private client: OpenAI;
   private tokenizers = new Map<string, Tiktoken>();
-  
-  readonly supportedModels = EMBEDDING_MODELS;
 
   constructor(apiKey: string, baseURL?: string) {
     this.client = new OpenAI({ 
@@ -28,7 +26,7 @@ export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
   }
 
   async embed(text: string, model: string): Promise<EmbeddingResult> {
-    if (!this.supportedModels.includes(model)) {
+    if (!EMBEDDING_MODELS.includes(model)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }
 

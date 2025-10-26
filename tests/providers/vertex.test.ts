@@ -21,16 +21,6 @@ describe('VertexAIProvider', () => {
   });
 
   describe('Unit Tests', () => {
-    describe('Supported Models', () => {
-      it('should have supported models', () => {
-        expect(provider.supportedModels).toBeDefined();
-        expect(Array.isArray(provider.supportedModels)).toBe(true);
-        expect(provider.supportedModels).toContain('text-embedding-005');
-        expect(provider.supportedModels).toContain('text-embedding-004');
-        expect(provider.supportedModels).toContain('text-multilingual-embedding-002');
-      });
-    });
-
     describe('Provider Configuration', () => {
       it('should initialize with project ID and credentials', () => {
         expect(() => new VertexAIProvider('test-project', 'us-central1', mockCredentials)).not.toThrow();
@@ -47,7 +37,6 @@ describe('VertexAIProvider', () => {
       it('should create provider instance', () => {
         const testProvider = new VertexAIProvider('test-project-id', 'us-central1', mockCredentials);
         expect(testProvider).toBeInstanceOf(VertexAIProvider);
-        expect(testProvider.supportedModels).toBeDefined();
       });
     });
 

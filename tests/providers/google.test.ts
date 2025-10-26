@@ -10,13 +10,6 @@ describe('GoogleProvider', () => {
   });
 
   describe('Unit Tests', () => {
-    describe('Supported Models', () => {
-      it('should have supported models', () => {
-        expect(provider.supportedModels).toBeDefined();
-        expect(Array.isArray(provider.supportedModels)).toBe(true);
-      });
-    });
-
     describe('Provider Configuration', () => {
       it('should initialize with API key', () => {
         expect(() => new GoogleProvider('test-key')).not.toThrow();
@@ -25,7 +18,6 @@ describe('GoogleProvider', () => {
       it('should create provider instance', () => {
         const testProvider = new GoogleProvider('test-api-key');
         expect(testProvider).toBeInstanceOf(GoogleProvider);
-        expect(testProvider.supportedModels).toBeDefined();
       });
     });
 
@@ -49,13 +41,13 @@ describe('GoogleProvider', () => {
 
     describe('Token Counting', () => {
       it.skipIf(!hasApiKey)('should count tokens for Gemini chat models', async () => {
-        const count = await countTokens('google/gemini-1.5-pro', 'Hello world');
+        const count = await countTokens('google/gemini-2.5-pro', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
 
       it.skipIf(!hasApiKey)('should count tokens for Gemini flash models', async () => {
-        const count = await countTokens('google/gemini-1.5-flash', 'Hello world');
+        const count = await countTokens('google/gemini-2.5-flash', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
@@ -63,10 +55,10 @@ describe('GoogleProvider', () => {
       it.skipIf(!hasApiKey)('should handle longer text correctly', async () => {
         const shortText = 'Hello';
         const longText = 'Hello world this is a longer sentence with more words and punctuation!';
-        
-        const shortCount = await countTokens('google/gemini-1.5-pro', shortText);
-        const longCount = await countTokens('google/gemini-1.5-pro', longText);
-        
+
+        const shortCount = await countTokens('google/gemini-2.5-pro', shortText);
+        const longCount = await countTokens('google/gemini-2.5-pro', longText);
+
         expect(longCount).toBeGreaterThan(shortCount);
       });
     });
