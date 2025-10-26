@@ -30,6 +30,8 @@ export const CONTEXT_LIMITS = {
   'openai/gpt-3.5-turbo': 16_385,
   
   // Anthropic - Claude 4 series (using official aliases)
+  'anthropic/claude-sonnet-4.5': 200_000,
+  'anthropic/claude-opus-4.1': 200_000,
   'anthropic/claude-opus-4-0': 200_000,
   'anthropic/claude-sonnet-4-0': 200_000,
   
@@ -64,33 +66,6 @@ export const EMBEDDING_MODELS = [
   'vertex/text-embedding-005',
   'vertex/text-embedding-004',
   'vertex/text-multilingual-embedding-002',
-] as const;
-
-export const TOKENIZATION_MODELS = [
-  // OpenAI - Latest models (o200k_base tokenizer)
-  'openai/gpt-4.1', 'openai/gpt-4.1-mini', 'openai/o4-mini', 'openai/o3', 'openai/o1', 'openai/o1-preview', 'openai/o1-mini', 
-  'openai/gpt-4o', 'openai/gpt-4o-mini',
-  
-  // OpenAI - Older models (cl100k_base tokenizer)
-  'openai/gpt-4', 'openai/gpt-4-turbo', 'openai/gpt-3.5-turbo',
-  
-  // OpenAI - Embedding models (cl100k_base tokenizer)
-  'openai/text-embedding-3-small', 'openai/text-embedding-3-large', 'openai/text-embedding-ada-002',
-  
-  // Anthropic - Claude 4 series (using official aliases)
-  'anthropic/claude-opus-4-0', 'anthropic/claude-sonnet-4-0',
-  
-  // Anthropic - Claude 3 series (using official aliases)
-  'anthropic/claude-3-7-sonnet-latest', 'anthropic/claude-3-5-sonnet-latest', 'anthropic/claude-3-5-haiku-latest',
-  'anthropic/claude-3-opus-latest',
-  
-  // Google - Latest Gemini chat models
-  'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.0-flash', 
-  'google/gemini-1.5-pro', 'google/gemini-1.5-flash', 'google/gemini-1.5-flash-8b',
-  'google/gemini-pro',
-  
-  // Google - Embedding models
-  'google/gemini-embedding-exp-03-07', 'google/text-embedding-004', 'google/gemini-embedding-001',
 ] as const;
 
 /**
@@ -139,5 +114,4 @@ export const EMBEDDING_DIMENSIONS = {
 
 export type SupportedModel = keyof typeof CONTEXT_LIMITS;
 export type SupportedEmbeddingModel = keyof typeof EMBEDDING_LIMITS;
-export type SupportedTokenizationModel = typeof TOKENIZATION_MODELS[number];
 export type SupportedEmbeddingModelName = typeof EMBEDDING_MODELS[number];

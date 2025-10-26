@@ -5,7 +5,7 @@ import { OpenAIProvider } from './providers/openai.js';
 import { AnthropicProvider } from './providers/anthropic.js';
 import { GoogleProvider } from './providers/google.js';
 import { VertexAIProvider } from './providers/vertex.js';
-import { EMBEDDING_MODELS, TOKENIZATION_MODELS, TOKENIZATION_PROVIDERS, EMBEDDING_PROVIDERS, EMBEDDING_LIMITS, EMBEDDING_DIMENSIONS, CONTEXT_LIMITS } from './constants/models.js';
+import { EMBEDDING_MODELS, TOKENIZATION_PROVIDERS, EMBEDDING_PROVIDERS, EMBEDDING_LIMITS, EMBEDDING_DIMENSIONS, CONTEXT_LIMITS } from './constants/models.js';
 import type { EmbeddingResult, LibraryConfig, Message, TruncateOptions, SplitTextOptions, TokenizerProvider, EmbeddingProvider } from './types/index.js';
 
 type ProviderInstance = OpenAIProvider | AnthropicProvider | GoogleProvider | VertexAIProvider;
@@ -125,8 +125,8 @@ export async function embedText(model: string, text: string): Promise<EmbeddingR
 export async function countTokens(model: string, text: string): Promise<number> {
   const { provider, modelName } = parseModel(model); // This throws format error if invalid
   
-  if (!TOKENIZATION_MODELS.includes(model as any)) {
-    throw new Error(`Model ${model} does not support tokenization functionality`);
+  if (!TOKENIZATION_PROVIDERS.includes(provider as any)) {
+    throw new Error(`Provider ${provider} does not support tokenization functionality`);
   }
   
   const providerInstance = getTokenizerProvider(provider);
