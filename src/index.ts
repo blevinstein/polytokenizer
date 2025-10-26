@@ -138,7 +138,7 @@ export async function tryCountTokens(model: string, text: string): Promise<numbe
   try {
     return await countTokens(model, text);
   } catch (error) {
-    console.error(error);
+    console.error(`Failed to countTokens for model '${model}': ${error}`);
     return estimateTokens(text);
   }
 }
