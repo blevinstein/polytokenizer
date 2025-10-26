@@ -11,14 +11,18 @@ interface AnthropicCountTokensResponse {
   input_tokens: number;
 }
 
-const SUPPORTED_MODELS = [
+export const SUPPORTED_MODELS = [
+  // Claude 4 series
+  'claude-opus-4-1',
   'claude-opus-4-0',
+  'claude-sonnet-4-5',
   'claude-sonnet-4-0',
+  // Claude 3 series
   'claude-3-7-sonnet-latest',
   'claude-3-5-sonnet-latest',
   'claude-3-5-haiku-latest',
   'claude-3-opus-latest'
-];
+] as const;
 
 export class AnthropicProvider implements TokenizerProvider {
   private apiKey: string;

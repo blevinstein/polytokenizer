@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
-import { AnthropicProvider } from '../../src/providers/anthropic.js';
+import { AnthropicProvider, SUPPORTED_MODELS } from '../../src/providers/anthropic.js';
 import { countTokens, configure } from '../../src/index.js';
 
 describe('AnthropicProvider', () => {
@@ -63,22 +63,12 @@ describe('AnthropicProvider', () => {
     });
 
     describe('Token Counting', () => {
-      it.skipIf(!hasApiKey)('should count tokens for Claude 3.5 Sonnet', async () => {
-        const count = await countTokens('anthropic/claude-3-5-sonnet-latest', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
-      });
-
-      it.skipIf(!hasApiKey)('should count tokens for Claude 3.7 Sonnet', async () => {
-        const count = await countTokens('anthropic/claude-3-7-sonnet-latest', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
-      });
-
-      it.skipIf(!hasApiKey)('should count tokens for Claude 3.5 Haiku', async () => {
-        const count = await countTokens('anthropic/claude-3-5-haiku-latest', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
+      it.skipIf(!hasApiKey)('should count tokens for all supported Anthropic models', async () => {
+        for (const model of SUPPORTED_MODELS) {
+          const count = await countTokens(`anthropic/${model}`, 'Hello world');
+          expect(count).toBeGreaterThan(0);
+          expect(typeof count).toBe('number');
+        }
       });
 
       it.skipIf(!hasApiKey)('should handle longer text correctly', async () => {
