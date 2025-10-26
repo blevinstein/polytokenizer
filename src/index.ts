@@ -212,6 +212,8 @@ export async function splitTextMaxTokens(text: string, model: string, maxTokens:
 
 export async function trimMessages(messages: Message[], model: string, maxTokens: number, options: TruncateOptions = {}): Promise<Message[]> {
   const { strategy = 'early', preserveSystem = true } = options;
+
+  if (!maxTokens) throw new Error('Must specify maxTokens');
   
   if (messages.length === 0) return [];
 

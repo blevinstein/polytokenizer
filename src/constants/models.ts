@@ -13,7 +13,7 @@
  */
 
 export const CONTEXT_LIMITS = {
-  // OpenAI - Latest models
+  // OpenAI
   'openai/gpt-4.1': 1_000_000,
   'openai/gpt-4.1-mini': 1_000_000,
   'openai/o4-mini': 200_000,
@@ -23,19 +23,17 @@ export const CONTEXT_LIMITS = {
   'openai/o1-mini': 128_000,
   'openai/gpt-4o': 128_000,
   'openai/gpt-4o-mini': 128_000,
-  
-  // OpenAI - Older models
   'openai/gpt-4': 8_192,
   'openai/gpt-4-turbo': 128_000,
   'openai/gpt-3.5-turbo': 16_385,
   
-  // Anthropic - Claude 4 series (using official aliases)
-  'anthropic/claude-sonnet-4.5': 200_000,
-  'anthropic/claude-opus-4.1': 200_000,
+  // Anthropic - Claude 4 series
+  'anthropic/claude-sonnet-4-5': 200_000,
+  'anthropic/claude-opus-4-1': 200_000,
   'anthropic/claude-opus-4-0': 200_000,
   'anthropic/claude-sonnet-4-0': 200_000,
   
-  // Anthropic - Claude 3 series (using official aliases)
+  // Anthropic - Claude 3 series
   'anthropic/claude-3-7-sonnet-latest': 200_000,
   'anthropic/claude-3-5-sonnet-latest': 200_000,
   'anthropic/claude-3-5-haiku-latest': 200_000,
