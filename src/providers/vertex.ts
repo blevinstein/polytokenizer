@@ -5,16 +5,12 @@ const EMBEDDING_MODELS = [
   'gemini-embedding-001',       // 3072 dimensions (default), configurable (768/1536/3072), MRL-trained
   'text-embedding-005',         // 768 dimensions, 2048 tokens, English/code optimized
   'text-multilingual-embedding-002', // 768 dimensions, multilingual
-  'multilingual-e5-small',      // 384 dimensions, multilingual
-  'multilingual-e5-large',      // 1024 dimensions, multilingual
 ];
 
 const EMBEDDING_COSTS = {
   'gemini-embedding-001': 0.00015e-3, // $0.00015 per 1K tokens
   'text-embedding-005': 0.000025e-3, // $0.000025 per 1K characters
   'text-multilingual-embedding-002': 0.000025e-3, // $0.000025 per 1K characters
-  'multilingual-e5-small': 0.000025e-3, // $0.000025 per 1K characters
-  'multilingual-e5-large': 0.000025e-3, // $0.000025 per 1K characters
 } as const;
 
 interface VertexAIPredictRequest {

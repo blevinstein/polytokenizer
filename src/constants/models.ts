@@ -64,8 +64,6 @@ export const EMBEDDING_MODELS = [
   'vertex/gemini-embedding-001',
   'vertex/text-embedding-005',
   'vertex/text-multilingual-embedding-002',
-  'vertex/multilingual-e5-small',
-  'vertex/multilingual-e5-large',
 ] as const;
 
 /**
@@ -91,8 +89,6 @@ export const EMBEDDING_LIMITS = {
   'vertex/gemini-embedding-001': 2_048,
   'vertex/text-embedding-005': 2_048,
   'vertex/text-multilingual-embedding-002': 2_048,
-  'vertex/multilingual-e5-small': 512,
-  'vertex/multilingual-e5-large': 512,
 } as const;
 
 export const EMBEDDING_DIMENSIONS = {
@@ -108,8 +104,6 @@ export const EMBEDDING_DIMENSIONS = {
   'vertex/gemini-embedding-001': 3072,  // Default dimension, configurable (768/1536/3072)
   'vertex/text-embedding-005': 768,
   'vertex/text-multilingual-embedding-002': 768,
-  'vertex/multilingual-e5-small': 384,
-  'vertex/multilingual-e5-large': 1024,
 } as const;
 
 export type SupportedModel = keyof typeof CONTEXT_LIMITS;

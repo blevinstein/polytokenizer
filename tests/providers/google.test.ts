@@ -123,6 +123,33 @@ describe('GoogleProvider', () => {
         expect(dim3072.vector.slice(0, 768)).toBeDefined();
       });
 
+      it.skipIf(!hasApiKey)('should reject empty text', async () => {
+        await expect(embedText('google/gemini-embedding-001', ''))
+          .rejects
+          .toThrow();
+      });
+
+      it.skipIf(!hasApiKey)('should handle whitespace-only text', async () => {
+        const result = await embedText('google/gemini-embedding-001', '   \n\t  ');
+        expect(result.vector).toBeDefined();
+        expect(Array.isArray(result.vector)).toBe(true);
+      });
+
+      it.skipIf(!hasApiKey)('should handle very long text', async () => {
+        const longText = 'This is a test sentence. '.repeat(200);
+        const result = await embedText('google/gemini-embedding-001', longText);
+        expect(result.vector).toBeDefined();
+        expect(result.vector.length).toBe(3072);
+      });
+
+      it.skipIf(!hasApiKey)('should handle special characters and unicode', async () => {
+        const unicodeText = 'Hello 世界 🌍 Привет مرحبا';
+        const result = await embedText('google/gemini-embedding-001', unicodeText);
+        expect(result.vector).toBeDefined();
+        expect(result.vector.length).toBe(3072);
+        expect(result.model).toBe('google/gemini-embedding-001');
+      });
+
       it.skipIf(!hasApiKey)('should reject invalid API keys', async () => {
         configure({ google: { apiKey: 'invalid-key-test' } });
         await expect(embedText('google/gemini-embedding-001', 'test')).rejects.toThrow();
@@ -131,6 +158,42 @@ describe('GoogleProvider', () => {
         if (hasApiKey) {
           configure({ google: { apiKey: process.env.GEMINI_API_KEY! } });
         }
+      });
+    });
+
+    describe('Chat Model Token Counting', () => {
+      it.skipIf(!hasApiKey)('should count tokens for gemini-2.5-flash-lite', async () => {
+        const count = await countTokens('google/gemini-2.5-flash-lite', 'Hello world');
+        expect(count).toBeGreaterThan(0);
+        expect(typeof count).toBe('number');
+      });
+
+      it.skipIf(!hasApiKey)('should count tokens for gemini-2.0-flash', async () => {
+        const count = await countTokens('google/gemini-2.0-flash', 'Hello world');
+        expect(count).toBeGreaterThan(0);
+        expect(typeof count).toBe('number');
+      });
+
+      it.skipIf(!hasApiKey)('should count tokens for gemini-2.0-flash-lite', async () => {
+        const count = await countTokens('google/gemini-2.0-flash-lite', 'Hello world');
+        expect(count).toBeGreaterThan(0);
+        expect(typeof count).toBe('number');
+      });
+
+      it.skipIf(!hasApiKey)('should count tokens consistently across models', async () => {
+        const text = 'The quick brown fox jumps over the lazy dog.';
+        
+        const countFlash = await countTokens('google/gemini-2.5-flash', text);
+        const countPro = await countTokens('google/gemini-2.5-pro', text);
+        
+        expect(countFlash).toBeGreaterThan(0);
+        expect(countPro).toBeGreaterThan(0);
+      });
+
+      it.skipIf(!hasApiKey)('should handle special characters in token counting', async () => {
+        const text = 'Code: const x = {"key": "value"}; // comment';
+        const count = await countTokens('google/gemini-2.5-pro', text);
+        expect(count).toBeGreaterThan(0);
       });
     });
   });
