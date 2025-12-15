@@ -60,7 +60,7 @@ describe('PolyTokenizer Core', () => {
     it('should validate embedding model capabilities', async () => {
       // Test that chat models reject embedding requests
       await expect(embedText('openai/gpt-4o', 'test')).rejects.toThrow('does not support embedding functionality');
-      await expect(embedText('anthropic/claude-3-5-sonnet-latest', 'test')).rejects.toThrow('does not support embedding functionality');
+      await expect(embedText('anthropic/claude-sonnet-4-5', 'test')).rejects.toThrow('does not support embedding functionality');
       await expect(embedText('google/gemini-1.5-pro', 'test')).rejects.toThrow('does not support embedding functionality');
     });
   });

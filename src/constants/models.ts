@@ -27,17 +27,19 @@ export const CONTEXT_LIMITS = {
   'openai/gpt-4-turbo': 128_000,
   'openai/gpt-3.5-turbo': 16_385,
   
-  // Anthropic - Claude 4 series
+  // Anthropic - Claude 4.5 series (current)
   'anthropic/claude-sonnet-4-5': 200_000,
+  'anthropic/claude-haiku-4-5': 200_000,
+  'anthropic/claude-opus-4-5': 200_000,
+
+  // Anthropic - Claude 4 series (legacy)
   'anthropic/claude-opus-4-1': 200_000,
-  'anthropic/claude-opus-4-0': 200_000,
   'anthropic/claude-sonnet-4-0': 200_000,
-  
-  // Anthropic - Claude 3 series
+  'anthropic/claude-opus-4-0': 200_000,
+
+  // Anthropic - Claude 3 series (legacy)
   'anthropic/claude-3-7-sonnet-latest': 200_000,
-  'anthropic/claude-3-5-sonnet-latest': 200_000,
   'anthropic/claude-3-5-haiku-latest': 200_000,
-  'anthropic/claude-3-opus-latest': 200_000,
   
   // Google - Latest models
   'google/gemini-2.5-pro': 2_000_000,

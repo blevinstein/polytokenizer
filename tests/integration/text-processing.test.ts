@@ -46,7 +46,7 @@ describe('Text Processing Integration', () => {
 
     it.skipIf(!hasAnthropicKey)('should work with Anthropic models', async () => {
       const text = 'Test sentence for splitting with Anthropic models and API integration.';
-      const chunks = await splitTextMaxTokens(text, 'anthropic/claude-3-5-sonnet-latest', 10);
+      const chunks = await splitTextMaxTokens(text, 'anthropic/claude-sonnet-4-5', 10);
       
       expect(chunks.length).toBeGreaterThanOrEqual(1);
       expect(chunks.join(' ')).toContain('Test');
@@ -124,7 +124,7 @@ describe('Text Processing Integration', () => {
         { role: 'user' as const, content: 'What is the weather like today?' }
       ];
       
-      const trimmed = await trimMessages(messages, 'anthropic/claude-3-5-sonnet-latest', 50);
+      const trimmed = await trimMessages(messages, 'anthropic/claude-sonnet-4-5', 50);
       expect(trimmed.length).toBeLessThanOrEqual(messages.length);
       expect(trimmed.length).toBeGreaterThan(0);
     });

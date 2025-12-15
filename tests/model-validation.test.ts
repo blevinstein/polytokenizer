@@ -21,7 +21,7 @@ describe('Model Validation', () => {
     it('should reject chat models for embeddings', async () => {
       await expect(embedText('openai/gpt-4o', 'test')).rejects.toThrow('does not support embedding functionality');
       await expect(embedText('google/gemini-2.5-pro', 'test')).rejects.toThrow('does not support embedding functionality');
-      await expect(embedText('anthropic/claude-3-5-sonnet-latest', 'test')).rejects.toThrow('does not support embedding functionality');
+      await expect(embedText('anthropic/claude-sonnet-4-5', 'test')).rejects.toThrow('does not support embedding functionality');
     });
 
     it('should reject unsupported models', async () => {
@@ -41,7 +41,7 @@ describe('Model Validation', () => {
       expect(typeof openaiEmbedResult).toBe('number');
       expect(openaiEmbedResult).toBeGreaterThan(0);
 
-      const anthropicResult = await countTokens('anthropic/claude-3-5-sonnet-latest', 'test');
+      const anthropicResult = await countTokens('anthropic/claude-sonnet-4-5', 'test');
       expect(typeof anthropicResult).toBe('number');
       expect(anthropicResult).toBeGreaterThan(0);
 
