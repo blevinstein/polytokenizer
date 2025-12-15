@@ -297,15 +297,19 @@ OpenAI models add extra tokens for chat formatting:
 
 ### Anthropic Models
 
-**Claude 4 Series:**
+**Claude 4.5 Series (Current):**
+- `anthropic/claude-opus-4-5` - Claude 4.5 Opus (200K context)
+- `anthropic/claude-sonnet-4-5` - Claude 4.5 Sonnet (200K context)
+- `anthropic/claude-haiku-4-5` - Claude 4.5 Haiku (200K context)
+
+**Claude 4 Series (Legacy):**
+- `anthropic/claude-opus-4-1` - Claude 4.1 Opus (200K context)
 - `anthropic/claude-opus-4-0` - Claude 4 Opus (200K context)
 - `anthropic/claude-sonnet-4-0` - Claude 4 Sonnet (200K context)
 
-**Claude 3 Series:**
+**Claude 3 Series (Legacy):**
 - `anthropic/claude-3-7-sonnet-latest` - Claude 3.7 Sonnet (200K context)
-- `anthropic/claude-3-5-sonnet-latest` - Claude 3.5 Sonnet (200K context)
 - `anthropic/claude-3-5-haiku-latest` - Claude 3.5 Haiku (200K context)
-- `anthropic/claude-3-opus-latest` - Claude 3 Opus (200K context)
 
 *Note: Anthropic models support tokenization only (no embedding capabilities)*
 
