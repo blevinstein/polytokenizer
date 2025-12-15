@@ -35,55 +35,12 @@ export class AnthropicProvider implements TokenizerProvider {
   }
 
   async countTokens(model: string, text: string): Promise<number> {
-    try {
-      const response = await fetch(`${this.baseURL}/v1/messages/count_tokens`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: text }],
-        } as AnthropicCountTokensRequest),
-      });
-
-      if (!response.ok) {
-        throw this.createError(
-          response.status === 401 ? 'API_KEY_INVALID' :
-          response.status === 429 ? 'RATE_LIMIT' : 'API_ERROR',
-          `HTTP ${response.status}: ${response.statusText}`,
-          response.status
-        );
-      }
-
-      const data: AnthropicCountTokensResponse = await response.json();
-      return data.input_tokens;
-    } catch (error: any) {
-      if (error.code) {
-        throw error;
-      }
-      throw this.createError('API_ERROR', error.message);
-    }
-  }
-
-  async countTokensForMessages(model: string, messages: Message[], systemPrompt?: string): Promise<number> {
-    const anthropicMessages = messages.map(msg => ({
-      role: msg.role === 'system' ? 'user' : msg.role,
-      content: msg.content,
-    }));
+    const requestBody = {
+      model,
+      messages: [{ role: 'user', content: text }],
+    } as AnthropicCountTokensRequest;
 
     try {
-      const requestBody: AnthropicCountTokensRequest = {
-        model,
-        messages: anthropicMessages,
-      };
-
-      if (systemPrompt) {
-        requestBody.system = systemPrompt;
-      }
-
       const response = await fetch(`${this.baseURL}/v1/messages/count_tokens`, {
         method: 'POST',
         headers: {
@@ -95,10 +52,28 @@ export class AnthropicProvider implements TokenizerProvider {
       });
 
       if (!response.ok) {
+        // Get response body for better error diagnostics
+        let responseBody = '';
+        try {
+          responseBody = await response.text();
+        } catch (e) {
+          responseBody = '<unable to read response body>';
+        }
+
+        // Log detailed error information for 400 errors
+        const errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        console.error(`Anthropic API error for model '${model}':`, {
+          status: response.status,
+          statusText: response.statusText,
+          requestBody,
+          responseBody,
+          url: `${this.baseURL}/v1/messages/count_tokens`,
+        });
+
         throw this.createError(
           response.status === 401 ? 'API_KEY_INVALID' :
-          response.status === 429 ? 'RATE_LIMIT' : 'API_ERROR',
-          `HTTP ${response.status}: ${response.statusText}`,
+            response.status === 429 ? 'RATE_LIMIT' : 'API_ERROR',
+          `${errorMessage}. Response: ${responseBody}`,
           response.status
         );
       }
@@ -109,6 +84,77 @@ export class AnthropicProvider implements TokenizerProvider {
       if (error.code) {
         throw error;
       }
+      console.error(`Anthropic API unexpected error for model '${model}':`, {
+        error: error.message,
+        requestBody,
+      });
+      throw this.createError('API_ERROR', error.message);
+    }
+  }
+
+  async countTokensForMessages(model: string, messages: Message[], systemPrompt?: string): Promise<number> {
+    const anthropicMessages = messages.map(msg => ({
+      role: msg.role === 'system' ? 'user' : msg.role,
+      content: msg.content,
+    }));
+
+    const requestBody: AnthropicCountTokensRequest = {
+      model,
+      messages: anthropicMessages,
+    };
+
+    if (systemPrompt) {
+      requestBody.system = systemPrompt;
+    }
+
+    try {
+      const response = await fetch(`${this.baseURL}/v1/messages/count_tokens`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        // Get response body for better error diagnostics
+        let responseBody = '';
+        try {
+          responseBody = await response.text();
+        } catch (e) {
+          responseBody = '<unable to read response body>';
+        }
+
+        // Log detailed error information for 400 errors
+        const errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        console.error(`Anthropic API error for model '${model}':`, {
+          status: response.status,
+          statusText: response.statusText,
+          requestBody,
+          responseBody,
+          url: `${this.baseURL}/v1/messages/count_tokens`,
+        });
+
+        throw this.createError(
+          response.status === 401 ? 'API_KEY_INVALID' :
+            response.status === 429 ? 'RATE_LIMIT' : 'API_ERROR',
+          `${errorMessage}. Response: ${responseBody}`,
+          response.status
+        );
+      }
+
+      const data: AnthropicCountTokensResponse = await response.json();
+      return data.input_tokens;
+    } catch (error: any) {
+      if (error.code) {
+        throw error;
+      }
+      console.error(`Anthropic API unexpected error for model '${model}':`, {
+        error: error.message,
+        requestBody,
+      });
       throw this.createError('API_ERROR', error.message);
     }
   }
@@ -123,14 +169,14 @@ export class AnthropicProvider implements TokenizerProvider {
     const error = new Error(message) as ProviderError;
     error.code = code;
     error.provider = 'anthropic';
-    
+
     if (statusCode !== undefined) {
       error.statusCode = statusCode;
       error.retryable = statusCode === 429 || statusCode >= 500;
     } else {
       error.retryable = false;
     }
-    
+
     return error;
   }
 } 

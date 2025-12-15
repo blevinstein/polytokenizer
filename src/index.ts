@@ -41,16 +41,16 @@ function createProvider(providerName: string): OpenAIProvider | AnthropicProvide
     );
   } else {
     const providerConfig = config[providerName as 'openai' | 'anthropic' | 'google'];
-    
+
     // Map provider names to their correct environment variable names
     const envVarMap = {
       'openai': 'OPENAI_API_KEY',
       'anthropic': 'ANTHROPIC_API_KEY',
       'google': 'GEMINI_API_KEY'
     };
-    
+
     const apiKey = providerConfig?.apiKey || process.env[envVarMap[providerName as keyof typeof envVarMap]];
-    
+
     if (!apiKey) {
       const envVarName = envVarMap[providerName as keyof typeof envVarMap];
       throw new Error(`API key not found for provider ${providerName}. Set ${envVarName} environment variable or call configure().`);
@@ -124,13 +124,13 @@ export async function embedText(model: string, text: string, dimensions?: number
 
 export async function countTokens(model: string, text: string): Promise<number> {
   const { provider, modelName } = parseModel(model); // This throws format error if invalid
-  
+
   if (!TOKENIZATION_PROVIDERS.includes(provider as any)) {
     throw new Error(`Provider ${provider} does not support tokenization functionality`);
   }
-  
+
   const providerInstance = getTokenizerProvider(provider);
-  
+
   return providerInstance.countTokens(modelName, text);
 }
 
@@ -138,7 +138,13 @@ export async function tryCountTokens(model: string, text: string): Promise<numbe
   try {
     return await countTokens(model, text);
   } catch (error) {
-    console.error(`Failed to countTokens for model '${model}': ${error}`);
+    const errorInfo = error instanceof Error ? error.message : String(error);
+    const textPreview = text.length > 100 ? `${text.substring(0, 100)}...` : text;
+    console.error(`Failed to countTokens for model '${model}':`, {
+      error: errorInfo,
+      textLength: text.length,
+      textPreview,
+    });
     return estimateTokens(text);
   }
 }
@@ -171,14 +177,14 @@ export async function splitTextMaxTokens(text: string, model: string, maxTokens:
   // Splitters are used in order (earlier splitters are preferred)
   for (const splitter of splitters) {
     parts = await async.flatMap(parts, async (part: { text: string; tokens: number }) => {
-        // Parts which are already under max tokens are returned as-is
-        if (part.tokens <= maxTokens) return [part];
-        
-        // Split larger part into segments and count the tokens for each segment
-        return await async.map(
-            part.text.split(splitter),
-            async (segment: string) => ({ text: segment, tokens: await tryCountTokens(model, segment) }));
-      });
+      // Parts which are already under max tokens are returned as-is
+      if (part.tokens <= maxTokens) return [part];
+
+      // Split larger part into segments and count the tokens for each segment
+      return await async.map(
+        part.text.split(splitter),
+        async (segment: string) => ({ text: segment, tokens: await tryCountTokens(model, segment) }));
+    });
   }
 
   const oversizedParts = parts.filter(p => p.tokens > maxTokens);
@@ -214,7 +220,7 @@ export async function trimMessages(messages: Message[], model: string, maxTokens
   const { strategy = 'early', preserveSystem = true } = options;
 
   if (!maxTokens) throw new Error('Must specify maxTokens');
-  
+
   if (messages.length === 0) return [];
 
   // TODO: Determine token overhead based on model
