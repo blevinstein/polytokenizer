@@ -8,14 +8,10 @@ describe('Model Validation', () => {
       const result1 = await embedText('openai/text-embedding-3-small', 'test');
       expect(result1.vector).toBeDefined();
       expect(Array.isArray(result1.vector)).toBe(true);
-      
-      const result2 = await embedText('google/text-embedding-004', 'test');
+
+      const result2 = await embedText('google/gemini-embedding-001', 'test');
       expect(result2.vector).toBeDefined();
       expect(Array.isArray(result2.vector)).toBe(true);
-      
-      const result3 = await embedText('google/gemini-embedding-exp-03-07', 'test');
-      expect(result3.vector).toBeDefined();
-      expect(Array.isArray(result3.vector)).toBe(true);
     });
 
     it('should reject chat models for embeddings', async () => {

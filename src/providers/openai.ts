@@ -25,7 +25,7 @@ export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
     });
   }
 
-  async embed(text: string, model: string): Promise<EmbeddingResult> {
+  async embed(text: string, model: string, dimensions?: number): Promise<EmbeddingResult> {
     if (!EMBEDDING_MODELS.includes(model)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }

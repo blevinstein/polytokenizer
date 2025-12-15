@@ -30,7 +30,12 @@ console.log(embedding.vector); // [0.1, -0.2, 0.3, ...]
 
 // Try different providers
 const vertexEmbedding = await embedText('vertex/text-embedding-005', 'Hello world');
-const googleEmbedding = await embedText('google/text-embedding-004', 'Hello world');
+const googleEmbedding = await embedText('google/gemini-embedding-001', 'Hello world');
+
+// Use configurable dimensions with gemini-embedding-001 (MRL-trained)
+const embedding768 = await embedText('google/gemini-embedding-001', 'Hello world', 768);
+const embedding1536 = await embedText('google/gemini-embedding-001', 'Hello world', 1536);
+const embedding3072 = await embedText('google/gemini-embedding-001', 'Hello world', 3072); // default
 
 // Count tokens
 const tokens = await countTokens('anthropic/claude-3-5-sonnet-latest', 'This is a test message');
@@ -173,15 +178,18 @@ const result = await embedText('openai/text-embedding-3-small', 'Hello world');
 const result = await embedText('vertex/text-embedding-005', 'Hello world');
 // Returns: { vector: number[], model: string, usage: { tokens: 2, cost: 0.00004 } }
 
-// Google Gemini embeddings
-const result = await embedText('google/text-embedding-004', 'Hello world');
-// Returns: { vector: number[], model: string, usage: { tokens: 2, cost: 0.0 } }
+// Google Gemini embeddings with configurable dimensions
+const result = await embedText('google/gemini-embedding-001', 'Hello world');
+// Returns: { vector: number[] (3072 dimensions by default), model: string, usage: { tokens: -1 } }
+
+const result768 = await embedText('google/gemini-embedding-001', 'Hello world', 768);
+// Returns: { vector: number[] (768 dimensions), model: string, usage: { tokens: -1 } }
 ```
 
 **Parameters:**
 - `model` (string): Model identifier in format `provider/model` (see Supported Models)
 - `text` (string): Text to embed (up to model's context limit)
-- `options` (object, optional): Provider-specific options
+- `dimensions` (number, optional): Output dimensionality
 
 **Returns:** `Promise<EmbeddingResult>` with:
 - `vector`: Array of numbers representing the text embedding
@@ -277,7 +285,11 @@ OpenAI models add extra tokens for chat formatting:
 
 ## Supported Models
 
+> **Note:** Model availability and specifications change frequently. Refer to the official documentation links below for the most current information.
+
 ### OpenAI Models
+
+**Official Documentation:** [OpenAI Models](https://platform.openai.com/docs/models) | [Changelog](https://platform.openai.com/docs/changelog)
 
 **Latest Generation (o200k_base tokenizer):**
 - `openai/gpt-4.1`, `openai/gpt-4.1-mini` - GPT-4.1 family (1M context)
@@ -297,6 +309,8 @@ OpenAI models add extra tokens for chat formatting:
 
 ### Anthropic Models
 
+**Official Documentation:** [Anthropic Models Overview](https://docs.anthropic.com/en/docs/about-claude/models/overview)
+
 **Claude 4.5 Series (Current):**
 - `anthropic/claude-opus-4-5` - Claude 4.5 Opus (200K context)
 - `anthropic/claude-sonnet-4-5` - Claude 4.5 Sonnet (200K context)
@@ -315,6 +329,8 @@ OpenAI models add extra tokens for chat formatting:
 
 ### Google Models
 
+**Official Documentation:** [Gemini API Models](https://ai.google.dev/gemini-api/docs/models) | [Changelog](https://ai.google.dev/gemini-api/docs/changelog)
+
 **Gemini 2.5 Series:**
 - `google/gemini-2.5-pro` - Gemini 2.5 Pro (2M context)
 - `google/gemini-2.5-flash` - Gemini 2.5 Flash (1M context)
@@ -328,15 +344,17 @@ OpenAI models add extra tokens for chat formatting:
 - `google/gemini-1.5-flash-8b` - Gemini 1.5 Flash 8B (1M context)
 
 **Embedding Models:**
-- `google/gemini-embedding-exp-03-07` - 3072 dimensions (8K context) - Experimental SOTA model
-- `google/text-embedding-004` - 768 dimensions (2K context) - General purpose (also available via Vertex AI)
-- `google/gemini-embedding-001` - 768 dimensions (2K context) - Legacy model
+- `google/gemini-embedding-001` - 3072 dimensions (default), configurable (768/1536/3072) - MRL-trained model with flexible dimensionality
 
 ### Vertex AI Models
 
+**Official Documentation:** [Vertex AI Embeddings](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/embeddings) | [Text Embeddings API](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings-api)
+
 **Embedding Models:**
-- `vertex/text-embedding-005` - 768 dimensions (2K context) - $0.00002/1K chars - Latest specialized model, English/code optimized
-- `vertex/text-embedding-004` - 768 dimensions (2K context) - $0.00002/1K chars - General purpose (also available via Google Gemini API)
-- `vertex/text-multilingual-embedding-002` - 768 dimensions (2K context) - $0.00002/1K chars - Multilingual support
+- `vertex/gemini-embedding-001` - 3072 dimensions (default), configurable (768/1536/3072) - $0.00015/1K tokens - MRL-trained model
+- `vertex/text-embedding-005` - 768 dimensions (2K context) - $0.000025/1K chars - Latest specialized model, English/code optimized
+- `vertex/text-multilingual-embedding-002` - 768 dimensions (2K context) - $0.000025/1K chars - Multilingual support
+- `vertex/multilingual-e5-small` - 384 dimensions (512 tokens) - $0.000025/1K chars - Small multilingual model
+- `vertex/multilingual-e5-large` - 1024 dimensions (512 tokens) - $0.000025/1K chars - Large multilingual model
 
 *Note: Vertex AI models support embeddings only (no tokenization capabilities). Vertex AI provides the most cost-effective embedding options.*

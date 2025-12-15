@@ -2,15 +2,19 @@ import { GoogleAuth } from 'google-auth-library';
 import type { EmbeddingResult, EmbeddingProvider, ProviderError } from '../types/index.js';
 
 const EMBEDDING_MODELS = [
-  'text-embedding-005',         // Default embedding model, 768 dimensions, 2048 tokens
-  'text-embedding-004',         // 768 dimensions
+  'gemini-embedding-001',       // 3072 dimensions (default), configurable (768/1536/3072), MRL-trained
+  'text-embedding-005',         // 768 dimensions, 2048 tokens, English/code optimized
   'text-multilingual-embedding-002', // 768 dimensions, multilingual
+  'multilingual-e5-small',      // 384 dimensions, multilingual
+  'multilingual-e5-large',      // 1024 dimensions, multilingual
 ];
 
 const EMBEDDING_COSTS = {
-  'text-embedding-005': 0.00002e-3, // $0.00002 per 1K characters
-  'text-embedding-004': 0.00002e-3, // $0.00002 per 1K characters  
-  'text-multilingual-embedding-002': 0.00002e-3, // $0.00002 per 1K characters
+  'gemini-embedding-001': 0.00015e-3, // $0.00015 per 1K tokens
+  'text-embedding-005': 0.000025e-3, // $0.000025 per 1K characters
+  'text-multilingual-embedding-002': 0.000025e-3, // $0.000025 per 1K characters
+  'multilingual-e5-small': 0.000025e-3, // $0.000025 per 1K characters
+  'multilingual-e5-large': 0.000025e-3, // $0.000025 per 1K characters
 } as const;
 
 interface VertexAIPredictRequest {
@@ -47,7 +51,7 @@ export class VertexAIProvider implements EmbeddingProvider {
     });
   }
 
-  async embed(text: string, model: string): Promise<EmbeddingResult> {
+  async embed(text: string, model: string, dimensions?: number): Promise<EmbeddingResult> {
     if (!EMBEDDING_MODELS.includes(model)) {
       throw new Error(`Model ${model} is not supported by Vertex AI provider`);
     }
@@ -100,7 +104,12 @@ export class VertexAIProvider implements EmbeddingProvider {
 
       // Calculate usage and cost
       const tokens = Math.ceil(text.length / 4); // Rough estimate: 4 chars per token
-      const cost = text.length * (EMBEDDING_COSTS[model as keyof typeof EMBEDDING_COSTS] || 0);
+
+      // For gemini-embedding-001, cost is per token. For others, cost is per character.
+      const costPerUnit = EMBEDDING_COSTS[model as keyof typeof EMBEDDING_COSTS] || 0;
+      const cost = model === 'gemini-embedding-001'
+        ? tokens * costPerUnit
+        : text.length * costPerUnit;
 
       return {
         vector: embedding.embeddings.values,

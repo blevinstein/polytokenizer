@@ -110,16 +110,16 @@ export function configure(newConfig: LibraryConfig): void {
   providers = {};
 }
 
-export async function embedText(model: string, text: string): Promise<EmbeddingResult> {
+export async function embedText(model: string, text: string, dimensions?: number): Promise<EmbeddingResult> {
   const { provider, modelName } = parseModel(model); // This throws format error if invalid
-  
+
   if (!EMBEDDING_MODELS.includes(model as any)) {
     throw new Error(`Model ${model} does not support embedding functionality`);
   }
-  
+
   const providerInstance = getEmbeddingProvider(provider);
-  
-  return providerInstance.embed(text, modelName);
+
+  return providerInstance.embed(text, modelName, dimensions);
 }
 
 export async function countTokens(model: string, text: string): Promise<number> {

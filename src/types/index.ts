@@ -88,7 +88,7 @@ export interface TokenizerProvider {
 }
 
 export interface EmbeddingProvider {
-  embed(text: string, model: string): Promise<EmbeddingResult>;
+  embed(text: string, model: string, dimensions?: number): Promise<EmbeddingResult>;
 }
 
 export interface ProviderError extends Error {

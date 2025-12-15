@@ -94,13 +94,13 @@ describe('VertexAIProvider', () => {
         expect(result.vector.every(num => typeof num === 'number')).toBe(true);
       });
 
-      it.skipIf(!hasVertexConfig)('should generate embeddings for text-embedding-004', async () => {
-        const result = await embedText('vertex/text-embedding-004', 'Hello world');
-        
+      it.skipIf(!hasVertexConfig)('should generate embeddings for gemini-embedding-001', async () => {
+        const result = await embedText('vertex/gemini-embedding-001', 'Hello world');
+
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
-        expect(result.vector.length).toBe(768); // text-embedding-004 dimension
-        expect(result.model).toBe('vertex/text-embedding-004');
+        expect(result.vector.length).toBe(3072); // gemini-embedding-001 default dimension
+        expect(result.model).toBe('vertex/gemini-embedding-001');
         expect(result.usage.tokens).toBeGreaterThan(0);
       });
 

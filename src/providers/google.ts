@@ -1,10 +1,8 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
 const EMBEDDING_MODELS = [
-  'gemini-embedding-exp-03-07', // 3072 dimensions, 8K input, experimental (Mar 2025)
-  'text-embedding-004',         // 768 dimensions, current recommended model
-  'embedding-001'               // 768 dimensions, legacy model
+  'gemini-embedding-001',       // 3072 dimensions (default), configurable (768/1536/3072), MRL-trained
 ];
 
 const CHAT_MODELS = [
@@ -16,27 +14,35 @@ const CHAT_MODELS = [
 ];
 
 export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
-  private client: GoogleGenerativeAI;
+  private client: GoogleGenAI;
 
   constructor(apiKey: string) {
-    this.client = new GoogleGenerativeAI(apiKey);
+    this.client = new GoogleGenAI({ apiKey });
   }
 
-  async embed(text: string, model: string): Promise<EmbeddingResult> {
+  async embed(text: string, model: string, dimensions?: number): Promise<EmbeddingResult> {
     if (!EMBEDDING_MODELS.includes(model)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }
 
     try {
-      const embeddingModel = this.client.getGenerativeModel({ model });
-      const result = await embeddingModel.embedContent(text);
+      const params: any = {
+        model,
+        contents: text,
+      };
 
-      if (!result.embedding || !result.embedding.values) {
+      if (dimensions) {
+        params.config = { outputDimensionality: dimensions };
+      }
+
+      const response = await this.client.models.embedContent(params);
+
+      if (!response.embeddings || response.embeddings.length === 0 || !response.embeddings[0].values) {
         throw this.createError('API_ERROR', 'No embedding returned from API');
       }
 
       return {
-        vector: result.embedding.values,
+        vector: response.embeddings[0].values,
         model: `google/${model}`,
         usage: {
           tokens: -1,
@@ -46,9 +52,9 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
       if (error.code) {
         throw error;
       }
-      
+
       throw this.createError(
-        error.status === 401 ? 'API_KEY_INVALID' : 
+        error.status === 401 ? 'API_KEY_INVALID' :
         error.status === 429 ? 'RATE_LIMIT' : 'API_ERROR',
         error.message,
         error.status
@@ -58,16 +64,18 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
 
   async countTokens(model: string, text: string): Promise<number> {
     try {
-      const genModel = this.client.getGenerativeModel({ model });
-      const result = await genModel.countTokens(text);
-      return result.totalTokens;
+      const response = await this.client.models.countTokens({
+        model,
+        contents: text,
+      });
+      return response.totalTokens || 0;
     } catch (error: any) {
       if (error.code) {
         throw error;
       }
-      
+
       throw this.createError(
-        error.status === 401 ? 'API_KEY_INVALID' : 
+        error.status === 401 ? 'API_KEY_INVALID' :
         error.status === 429 ? 'RATE_LIMIT' : 'API_ERROR',
         error.message,
         error.status
@@ -85,14 +93,14 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
     const error = new Error(message) as ProviderError;
     error.code = code;
     error.provider = 'google';
-    
+
     if (statusCode !== undefined) {
       error.statusCode = statusCode;
       error.retryable = statusCode === 429 || statusCode >= 500;
     } else {
       error.retryable = false;
     }
-    
+
     return error;
   }
-} 
+}

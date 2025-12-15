@@ -58,14 +58,14 @@ export const EMBEDDING_MODELS = [
   'openai/text-embedding-ada-002',
   
   // Google Embedding models (Gemini API)
-  'google/gemini-embedding-exp-03-07', 
-  'google/text-embedding-004', 
   'google/gemini-embedding-001',
-  
+
   // Vertex AI Embedding models
+  'vertex/gemini-embedding-001',
   'vertex/text-embedding-005',
-  'vertex/text-embedding-004',
   'vertex/text-multilingual-embedding-002',
+  'vertex/multilingual-e5-small',
+  'vertex/multilingual-e5-large',
 ] as const;
 
 /**
@@ -85,14 +85,14 @@ export const EMBEDDING_LIMITS = {
   'openai/text-embedding-ada-002': 8_192,
   
   // Google Embedding models (Gemini API)
-  'google/gemini-embedding-exp-03-07': 8_192,
-  'google/text-embedding-004': 2_048,
   'google/gemini-embedding-001': 2_048,
-  
+
   // Vertex AI Embedding models
+  'vertex/gemini-embedding-001': 2_048,
   'vertex/text-embedding-005': 2_048,
-  'vertex/text-embedding-004': 2_048,
   'vertex/text-multilingual-embedding-002': 2_048,
+  'vertex/multilingual-e5-small': 512,
+  'vertex/multilingual-e5-large': 512,
 } as const;
 
 export const EMBEDDING_DIMENSIONS = {
@@ -102,14 +102,14 @@ export const EMBEDDING_DIMENSIONS = {
   'openai/text-embedding-ada-002': 1536,
   
   // Google Embedding models (Gemini API)
-  'google/gemini-embedding-exp-03-07': 3072,
-  'google/text-embedding-004': 768,
-  'google/gemini-embedding-001': 768,
-  
+  'google/gemini-embedding-001': 3072,  // Default dimension, configurable (768/1536/3072)
+
   // Vertex AI Embedding models
+  'vertex/gemini-embedding-001': 3072,  // Default dimension, configurable (768/1536/3072)
   'vertex/text-embedding-005': 768,
-  'vertex/text-embedding-004': 768,
   'vertex/text-multilingual-embedding-002': 768,
+  'vertex/multilingual-e5-small': 384,
+  'vertex/multilingual-e5-large': 1024,
 } as const;
 
 export type SupportedModel = keyof typeof CONTEXT_LIMITS;

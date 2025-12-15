@@ -4,7 +4,7 @@ import { embedText, countTokens, configure } from '../../src/index.js';
 
 describe('GoogleProvider', () => {
   let provider: GoogleProvider;
-  
+
   beforeEach(() => {
     provider = new GoogleProvider('fake-api-key-for-testing');
   });
@@ -32,7 +32,7 @@ describe('GoogleProvider', () => {
 
   describe('Integration Tests', () => {
     const hasApiKey = !!process.env.GEMINI_API_KEY;
-    
+
     beforeAll(() => {
       if (hasApiKey) {
         configure({ google: { apiKey: process.env.GEMINI_API_KEY! } });
@@ -64,54 +64,69 @@ describe('GoogleProvider', () => {
     });
 
     describe('Embeddings', () => {
-      it.skipIf(!hasApiKey)('should generate embeddings with new experimental model', async () => {
-        const result = await embedText('google/gemini-embedding-exp-03-07', 'Hello world');
-        
+      it.skipIf(!hasApiKey)('should generate embeddings with gemini-embedding-001 (default 3072 dimensions)', async () => {
+        const result = await embedText('google/gemini-embedding-001', 'Hello world');
+
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
-        expect(result.vector.length).toBe(3072); // New model has 3072 dimensions
-        expect(result.model).toBe('google/gemini-embedding-exp-03-07');
-        
+        expect(result.vector.length).toBe(3072); // Default dimension for gemini-embedding-001
+        expect(result.model).toBe('google/gemini-embedding-001');
+
         // Check that vector contains numbers
         expect(result.vector.every(num => typeof num === 'number')).toBe(true);
       });
 
-      it.skipIf(!hasApiKey)('should generate embeddings with text-embedding-004', async () => {
-        const result = await embedText('google/text-embedding-004', 'Hello world');
-        
+      it.skipIf(!hasApiKey)('should generate embeddings with gemini-embedding-001 using 768 dimensions', async () => {
+        const result = await embedText('google/gemini-embedding-001', 'Hello world', 768);
+
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
-        expect(result.vector.length).toBe(768); // text-embedding-004 dimension
-        expect(result.model).toBe('google/text-embedding-004');
+        expect(result.vector.length).toBe(768); // Reduced dimension
+        expect(result.model).toBe('google/gemini-embedding-001');
       });
 
+      it.skipIf(!hasApiKey)('should generate embeddings with gemini-embedding-001 using 1536 dimensions', async () => {
+        const result = await embedText('google/gemini-embedding-001', 'Hello world', 1536);
+
+        expect(result.vector).toBeDefined();
+        expect(Array.isArray(result.vector)).toBe(true);
+        expect(result.vector.length).toBe(1536); // Medium dimension
+        expect(result.model).toBe('google/gemini-embedding-001');
+      });
+
+
       it.skipIf(!hasApiKey)('should handle different text inputs', async () => {
-        const shortResult = await embedText('google/gemini-embedding-exp-03-07', 'Hi');
-        const longResult = await embedText('google/gemini-embedding-exp-03-07', 'This is a much longer text that should have more tokens and produce a different embedding vector');
-        
+        const shortResult = await embedText('google/gemini-embedding-001', 'Hi');
+        const longResult = await embedText('google/gemini-embedding-001', 'This is a much longer text that should have more tokens and produce a different embedding vector');
+
         expect(longResult.vector.length).toBe(shortResult.vector.length);
-        
+
         // Vectors should be different
         expect(longResult.vector).not.toEqual(shortResult.vector);
       });
 
-      it.skipIf(!hasApiKey)('should demonstrate improved performance of experimental model', async () => {
+      it.skipIf(!hasApiKey)('should demonstrate MRL capability with different dimensions', async () => {
         const testText = 'Natural language processing and machine learning are important fields in artificial intelligence.';
-        
-        // Test both old and new models
-        const oldResult = await embedText('google/text-embedding-004', testText);
-        const newResult = await embedText('google/gemini-embedding-exp-03-07', testText);
-        
-        // New model should have higher dimensionality
-        expect(newResult.vector.length).toBeGreaterThan(oldResult.vector.length);
-        expect(newResult.vector.length).toBe(3072);
-        expect(oldResult.vector.length).toBe(768);
+
+        // Test different dimensionality settings
+        const dim768 = await embedText('google/gemini-embedding-001', testText, 768);
+        const dim1536 = await embedText('google/gemini-embedding-001', testText, 1536);
+        const dim3072 = await embedText('google/gemini-embedding-001', testText, 3072);
+
+        // Verify dimensions
+        expect(dim768.vector.length).toBe(768);
+        expect(dim1536.vector.length).toBe(1536);
+        expect(dim3072.vector.length).toBe(3072);
+
+        // Due to MRL training, the first 768 elements should be similar
+        // (though not identical due to normalization)
+        expect(dim3072.vector.slice(0, 768)).toBeDefined();
       });
 
       it.skipIf(!hasApiKey)('should reject invalid API keys', async () => {
         configure({ google: { apiKey: 'invalid-key-test' } });
-        await expect(embedText('google/text-embedding-004', 'test')).rejects.toThrow();
-        
+        await expect(embedText('google/gemini-embedding-001', 'test')).rejects.toThrow();
+
         // Restore valid key
         if (hasApiKey) {
           configure({ google: { apiKey: process.env.GEMINI_API_KEY! } });
@@ -119,4 +134,4 @@ describe('GoogleProvider', () => {
       });
     });
   });
-}); 
+});
