@@ -2,11 +2,24 @@ import { OpenAI } from 'openai';
 import { getEncoding, Tiktoken } from 'js-tiktoken';
 import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
-const EMBEDDING_MODELS = [
+export const EMBEDDING_MODELS = [
   'text-embedding-3-small',
   'text-embedding-3-large',
-  'text-embedding-ada-002'
-];
+  'text-embedding-ada-002',
+] as const;
+
+export const CHAT_MODELS = [
+  // GPT-5 series (current)
+  'gpt-5.2',
+  'gpt-5.1',
+  'gpt-5',
+  'gpt-5-mini',
+  'gpt-5-nano',
+  // O-series reasoning models
+  'o3',
+  'o1',
+  'o1-mini',
+] as const;
 
 const EMBEDDING_COSTS = {
   'text-embedding-3-small': 0.02e-6,
@@ -26,7 +39,7 @@ export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
   }
 
   async embed(text: string, model: string, dimensions?: number): Promise<EmbeddingResult> {
-    if (!EMBEDDING_MODELS.includes(model)) {
+    if (!(EMBEDDING_MODELS as readonly string[]).includes(model)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }
 
@@ -80,22 +93,23 @@ export class OpenAIProvider implements EmbeddingProvider, TokenizerProvider {
   }
 
   private getEncodingForModel(model?: string): 'gpt2' | 'cl100k_base' | 'o200k_base' {
-    if (!model) return 'cl100k_base';
-    
-    // o200k_base models (newer models)
-    if (model.startsWith('gpt-4.1') || 
-        model.startsWith('gpt-4o') || 
-        model.startsWith('o1') || 
-        model.startsWith('o3') || 
+    if (!model) return 'o200k_base';
+
+    // o200k_base models (GPT-5, GPT-4.1, GPT-4o, and O-series reasoning models)
+    if (model.startsWith('gpt-5') ||
+        model.startsWith('gpt-4.1') ||
+        model.startsWith('gpt-4o') ||
+        model.startsWith('o1') ||
+        model.startsWith('o3') ||
         model.startsWith('o4')) {
       return 'o200k_base';
-    } 
+    }
     // cl100k_base models (older GPT-4 and GPT-3.5)
-    else if (model.startsWith('gpt-4') || 
-             model.startsWith('gpt-3.5') || 
+    else if (model.startsWith('gpt-4') ||
+             model.startsWith('gpt-3.5') ||
              model.startsWith('text-embedding')) {
       return 'cl100k_base';
-    } 
+    }
     // Legacy models
     else {
       return 'gpt2';

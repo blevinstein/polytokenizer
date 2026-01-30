@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
-import { GoogleProvider } from '../../src/providers/google.js';
+import { GoogleProvider, EMBEDDING_MODELS, CHAT_MODELS } from '../../src/providers/google.js';
 import { embedText, countTokens, configure } from '../../src/index.js';
 
 describe('GoogleProvider', () => {
@@ -162,22 +162,12 @@ describe('GoogleProvider', () => {
     });
 
     describe('Chat Model Token Counting', () => {
-      it.skipIf(!hasApiKey)('should count tokens for gemini-2.5-flash-lite', async () => {
-        const count = await countTokens('google/gemini-2.5-flash-lite', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
-      });
-
-      it.skipIf(!hasApiKey)('should count tokens for gemini-2.0-flash', async () => {
-        const count = await countTokens('google/gemini-2.0-flash', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
-      });
-
-      it.skipIf(!hasApiKey)('should count tokens for gemini-2.0-flash-lite', async () => {
-        const count = await countTokens('google/gemini-2.0-flash-lite', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
+      it.skipIf(!hasApiKey)('should count tokens for all supported chat models', async () => {
+        for (const model of CHAT_MODELS) {
+          const count = await countTokens(`google/${model}`, 'Hello world');
+          expect(count).toBeGreaterThan(0);
+          expect(typeof count).toBe('number');
+        }
       });
 
       it.skipIf(!hasApiKey)('should count tokens consistently across models', async () => {

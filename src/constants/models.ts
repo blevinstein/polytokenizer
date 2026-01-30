@@ -13,20 +13,18 @@
  */
 
 export const CONTEXT_LIMITS = {
-  // OpenAI
-  'openai/gpt-4.1': 1_000_000,
-  'openai/gpt-4.1-mini': 1_000_000,
-  'openai/o4-mini': 200_000,
+  // OpenAI GPT-5 series (current - recommended)
+  'openai/gpt-5.2': 400_000,      // Latest flagship model (January 2026)
+  'openai/gpt-5.1': 400_000,      // Previous GPT-5 version
+  'openai/gpt-5': 400_000,        // Released August 2025
+  'openai/gpt-5-mini': 400_000,   // Faster, cost-efficient
+  'openai/gpt-5-nano': 400_000,   // Most efficient GPT-5 variant
+
+  // OpenAI O-series reasoning models
   'openai/o3': 200_000,
   'openai/o1': 200_000,
-  'openai/o1-preview': 128_000,
   'openai/o1-mini': 128_000,
-  'openai/gpt-4o': 128_000,
-  'openai/gpt-4o-mini': 128_000,
-  'openai/gpt-4': 8_192,
-  'openai/gpt-4-turbo': 128_000,
-  'openai/gpt-3.5-turbo': 16_385,
-  
+
   // Anthropic - Claude 4.5 series (current)
   'anthropic/claude-sonnet-4-5': 200_000,
   'anthropic/claude-haiku-4-5': 200_000,
@@ -40,15 +38,11 @@ export const CONTEXT_LIMITS = {
   // Anthropic - Claude 3 series (legacy)
   'anthropic/claude-3-7-sonnet-latest': 200_000,
   'anthropic/claude-3-5-haiku-latest': 200_000,
-  
-  // Google - Latest models
+
+  // Google Gemini 2.5 series (current)
   'google/gemini-2.5-pro': 2_000_000,
   'google/gemini-2.5-flash': 1_000_000,
-  'google/gemini-2.0-flash': 1_000_000,
-  'google/gemini-1.5-pro': 2_000_000,
-  'google/gemini-1.5-flash': 1_000_000,
-  'google/gemini-1.5-flash-8b': 1_000_000,
-  'google/gemini-pro': 32_768,
+  'google/gemini-2.5-flash-lite': 1_000_000,
 } as const;
 
 export const EMBEDDING_MODELS = [

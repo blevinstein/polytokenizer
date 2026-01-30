@@ -1,17 +1,16 @@
 import { GoogleGenAI } from '@google/genai';
 import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
-const EMBEDDING_MODELS = [
+export const EMBEDDING_MODELS = [
   'gemini-embedding-001',       // 3072 dimensions (default), configurable (768/1536/3072), MRL-trained
-];
+] as const;
 
-const CHAT_MODELS = [
-  'gemini-2.5-flash',           // Current flash model (2025)
-  'gemini-2.5-flash-lite',      // Lite flash model
-  'gemini-2.5-pro',             // Pro model
-  'gemini-2.0-flash',           // Previous generation flash
-  'gemini-2.0-flash-lite',      // Previous generation lite
-];
+export const CHAT_MODELS = [
+  // Gemini 2.5 series (current - recommended)
+  'gemini-2.5-flash',           // Current flash model
+  'gemini-2.5-flash-lite',      // Lite flash model - cost efficient
+  'gemini-2.5-pro',             // Pro model - best for complex tasks
+] as const;
 
 export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
   private client: GoogleGenAI;
@@ -21,7 +20,7 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
   }
 
   async embed(text: string, model: string, dimensions?: number): Promise<EmbeddingResult> {
-    if (!EMBEDDING_MODELS.includes(model)) {
+    if (!(EMBEDDING_MODELS as readonly string[]).includes(model)) {
       throw this.createError('INVALID_MODEL', `Model ${model} not supported for embeddings`);
     }
 

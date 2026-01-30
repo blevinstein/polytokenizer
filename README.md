@@ -38,11 +38,11 @@ const embedding1536 = await embedText('google/gemini-embedding-001', 'Hello worl
 const embedding3072 = await embedText('google/gemini-embedding-001', 'Hello world', 3072); // default
 
 // Count tokens
-const tokens = await countTokens('anthropic/claude-3-5-sonnet-latest', 'This is a test message');
+const tokens = await countTokens('anthropic/claude-sonnet-4-5', 'This is a test message');
 console.log(tokens); // 6
 
 // Split text to fit model context
-const chunks = await splitTextMaxTokens('openai/gpt-4o', longText, 1000);
+const chunks = await splitTextMaxTokens('openai/gpt-5', longText, 1000);
 console.log(chunks); // ['chunk1...', 'chunk2...']
 ```
 
@@ -203,9 +203,9 @@ const result768 = await embedText('google/gemini-embedding-001', 'Hello world', 
 Count tokens in text for the specified model.
 
 ```javascript
-const count = await countTokens('openai/gpt-4o', 'Hello world');
-const count = await countTokens('anthropic/claude-3-5-sonnet-latest', 'Hello world');
-const count = await countTokens('google/gemini-1.5-pro', 'Hello world');
+const count = await countTokens('openai/gpt-5', 'Hello world');
+const count = await countTokens('anthropic/claude-sonnet-4-5', 'Hello world');
+const count = await countTokens('google/gemini-2.5-pro', 'Hello world');
 ```
 
 **Parameters:**
@@ -221,7 +221,7 @@ const count = await countTokens('google/gemini-1.5-pro', 'Hello world');
 Split text into chunks that fit within the specified token limit.
 
 ```javascript
-const chunks = await splitTextMaxTokens(longText, 'openai/gpt-4o', 1000, {
+const chunks = await splitTextMaxTokens(longText, 'openai/gpt-5', 1000, {
   preserveSentences: true,  // default: true
   preserveWords: true       // default: true
 });
@@ -253,7 +253,7 @@ const messages = [
   // ... more messages
 ];
 
-const trimmed = await trimMessages(messages, 'openai/gpt-4o', 4000, {
+const trimmed = await trimMessages(messages, 'openai/gpt-5', 4000, {
   strategy: 'early',           // 'early' | 'late'
   preserveSystem: true,        // default: true
   extraTokensPerMessage: 4,    // optional: tokens added per message (default: 4)
@@ -291,16 +291,17 @@ OpenAI models add extra tokens for chat formatting:
 
 **Official Documentation:** [OpenAI Models](https://platform.openai.com/docs/models) | [Changelog](https://platform.openai.com/docs/changelog)
 
-**Latest Generation (o200k_base tokenizer):**
-- `openai/gpt-4.1`, `openai/gpt-4.1-mini` - GPT-4.1 family (1M context)
-- `openai/o4-mini` - O4 reasoning model (200K context)
-- `openai/o3` - O3 reasoning model (200K context)
-- `openai/o1`, `openai/o1-preview`, `openai/o1-mini` - O1 reasoning family (128K-200K context)
-- `openai/gpt-4o`, `openai/gpt-4o-mini` - GPT-4o family (128K context)
+**GPT-5 Series (Current - o200k_base tokenizer):**
+- `openai/gpt-5.2` - Latest flagship model (400K context) - $1.25/MTok input
+- `openai/gpt-5.1` - Previous GPT-5 version (400K context)
+- `openai/gpt-5` - Released August 2025 (400K context)
+- `openai/gpt-5-mini` - Faster, cost-efficient (400K context) - $0.25/MTok input
+- `openai/gpt-5-nano` - Most efficient variant (400K context) - $0.05/MTok input
 
-**Previous Generation (cl100k_base tokenizer):**
-- `openai/gpt-4`, `openai/gpt-4-turbo` - GPT-4 family (8K-128K context)
-- `openai/gpt-3.5-turbo` - GPT-3.5 family (16K context)
+**O-Series Reasoning Models (o200k_base tokenizer):**
+- `openai/o3` - O3 reasoning model (200K context)
+- `openai/o1` - O1 reasoning model (200K context)
+- `openai/o1-mini` - O1 mini (128K context)
 
 **Embedding Models:**
 - `openai/text-embedding-3-small` - 1536 dimensions (8K context) - $0.02/MTok
@@ -333,19 +334,10 @@ OpenAI models add extra tokens for chat formatting:
 
 **Chat Models (Tokenization Support):**
 
-*Gemini 2.5 Series:*
+*Gemini 2.5 Series (Current):*
 - `google/gemini-2.5-pro` - Gemini 2.5 Pro (2M context)
 - `google/gemini-2.5-flash` - Gemini 2.5 Flash (1M context)
-- `google/gemini-2.5-flash-lite` - Gemini 2.5 Flash Lite (1M context)
-
-*Gemini 2.0 Series:*
-- `google/gemini-2.0-flash` - Gemini 2.0 Flash (1M context)
-- `google/gemini-2.0-flash-lite` - Gemini 2.0 Flash Lite (1M context)
-
-*Gemini 1.5 Series:*
-- `google/gemini-1.5-pro` - Gemini 1.5 Pro (2M context)
-- `google/gemini-1.5-flash` - Gemini 1.5 Flash (1M context)
-- `google/gemini-1.5-flash-8b` - Gemini 1.5 Flash 8B (1M context)
+- `google/gemini-2.5-flash-lite` - Gemini 2.5 Flash Lite (1M context) - cost efficient
 
 **Embedding Models:**
 - `google/gemini-embedding-001` - configurable dimensions (3072 default) (2K tokens context)

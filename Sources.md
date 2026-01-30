@@ -100,21 +100,19 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 - Tiktoken Repository: https://github.com/openai/tiktoken
 - Tiktoken Cookbook: https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken
 
-**Current Models (as of May 2025):**
+**Current Models (as of January 2026):**
 
-**Chat Models with Tokenization:**
-- `gpt-4.1`: 1M context, 32k max output, $2.00/MTok input, $8.00/MTok output, **o200k_base** tokenizer (latest flagship model)
-- `gpt-4.1-mini`: 1M context, $0.50/MTok input, $2.00/MTok output, **o200k_base** tokenizer (efficient flagship variant)
-- `o4-mini`: 200k context, $1.00/MTok input, $4.00/MTok output, **o200k_base** tokenizer (latest reasoning model)
-- `o3`: 200k context, $60.00/MTok input, $240.00/MTok output, **o200k_base** tokenizer (latest flagship reasoning)
+**GPT-5 Series (Current - Recommended):**
+- `gpt-5.2`: 400k context, flagship model for coding and agentic tasks, **o200k_base** tokenizer
+- `gpt-5.1`: 400k context, previous GPT-5 version, **o200k_base** tokenizer
+- `gpt-5`: 400k context, $1.25/MTok input, $10.00/MTok output, **o200k_base** tokenizer (released August 2025)
+- `gpt-5-mini`: 400k context, $0.25/MTok input, $2.00/MTok output, **o200k_base** tokenizer
+- `gpt-5-nano`: 400k context, $0.05/MTok input, $0.40/MTok output, **o200k_base** tokenizer
+
+**O-Series Reasoning Models:**
+- `o3`: 200k context, $60.00/MTok input, $240.00/MTok output, **o200k_base** tokenizer
 - `o1`: 200k context, $15.00/MTok input, $60.00/MTok output, **o200k_base** tokenizer
-- `o1-preview`: 128k context, $15.00/MTok input, $60.00/MTok output, **o200k_base** tokenizer
 - `o1-mini`: 128k context, $3.00/MTok input, $12.00/MTok output, **o200k_base** tokenizer
-- `gpt-4o`: 128k context, $2.50/MTok input, $10.00/MTok output, **o200k_base** tokenizer
-- `gpt-4o-mini`: 128k context, $0.15/MTok input, $0.60/MTok output, **o200k_base** tokenizer
-- `gpt-4`: 8k/32k context, $30.00/MTok input, $60.00/MTok output, **cl100k_base** tokenizer
-- `gpt-4-turbo`: 128k context, $10.00/MTok input, $30.00/MTok output, **cl100k_base** tokenizer
-- `gpt-3.5-turbo`: 16k context, $0.50/MTok input, $1.50/MTok output, **cl100k_base** tokenizer
 
 **Embedding Models:**
 - `text-embedding-3-small`: 1536 dimensions, $0.02/MTok, **cl100k_base** tokenizer
@@ -124,10 +122,8 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 **Tokenizer Mapping:**
 | Tokenizer | Models |
 |-----------|--------|
-| **o200k_base** | gpt-4.1, gpt-4.1-mini, o3, o4-mini, o1 series, gpt-4o series |
-| **cl100k_base** | gpt-4, gpt-4-turbo, gpt-3.5-turbo, all embedding models |
-| **p50k_base** | Codex models, text-davinci series |
-| **r50k_base/gpt2** | Legacy GPT-3 models |
+| **o200k_base** | gpt-5 series, o3, o1 series |
+| **cl100k_base** | all embedding models |
 
 **Tokenization Implementation**: Local tiktoken library (no API calls needed)
 
@@ -140,18 +136,21 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 - Pricing: https://docs.anthropic.com/en/docs/about-claude/pricing
 - Token Counting API: https://docs.anthropic.com/en/api/counting-tokens
 
-**Current Models (as of May 2025):**
+**Current Models (as of January 2026):**
 
-**Claude 4 Series (Latest):**
-- `claude-4-opus`: 200k context, 32k max output, $15/MTok input, $75/MTok output
-- `claude-4-sonnet`: 200k context, 64k max output, $3/MTok input, $15/MTok output
+**Claude 4.5 Series (Current):**
+- `claude-opus-4-5`: 200k context, $15/MTok input, $75/MTok output
+- `claude-sonnet-4-5`: 200k context, $3/MTok input, $15/MTok output
+- `claude-haiku-4-5`: 200k context, $0.80/MTok input, $4/MTok output
 
-**Claude 3 Series:**
-- `claude-3.7-sonnet`: 200k context, 64k max output, $3/MTok input, $15/MTok output
-- `claude-3.5-sonnet`: 200k context, 8k max output, $3/MTok input, $15/MTok output
-- `claude-3.5-haiku`: 200k context, 8k max output, $0.80/MTok input, $4/MTok output
-- `claude-3-opus`: 200k context, 4k max output, $15/MTok input, $75/MTok output
-- `claude-3-haiku`: 200k context, 4k max output, $0.25/MTok input, $1.25/MTok output
+**Claude 4 Series (Legacy):**
+- `claude-opus-4-1`: 200k context, $15/MTok input, $75/MTok output
+- `claude-sonnet-4-0`: 200k context, $3/MTok input, $15/MTok output
+- `claude-opus-4-0`: 200k context, $15/MTok input, $75/MTok output
+
+**Claude 3 Series (Legacy):**
+- `claude-3-7-sonnet-latest`: 200k context, $3/MTok input, $15/MTok output
+- `claude-3-5-haiku-latest`: 200k context, $0.80/MTok input, $4/MTok output
 
 **Tokenization Implementation**: API-based via `/v1/messages/count_tokens` endpoint
 **Embedding Support**: ❌ No public embedding API
@@ -167,29 +166,15 @@ This file documents URLs and sources for AI model capabilities, pricing, context
 - Gemini API Reference: https://ai.google.dev/api/rest
 - Experimental Gemini Embedding: https://developers.googleblog.com/en/gemini-embedding-text-model-now-available-gemini-api/
 
-**Current Models (as of May 2025):**
+**Current Models (as of January 2026):**
 
-**Gemini 2.5 Series (Latest):**
+**Gemini 2.5 Series (Current):**
 - `gemini-2.5-pro`: 2M context, $1.25/MTok input, $5.00/MTok output
 - `gemini-2.5-flash`: 1M context, $0.075/MTok input, $0.30/MTok output
-
-**Gemini 2.0 Series:**
-- `gemini-2.0-flash`: 1M context, $0.075/MTok input, $0.30/MTok output
-
-**Gemini 1.5 Series:**
-- `gemini-1.5-pro`: 2M context, $1.25/MTok input, $5.00/MTok output
-- `gemini-1.5-flash`: 1M context, $0.075/MTok input, $0.30/MTok output
-- `gemini-1.5-flash-8b`: 1M context, $0.0375/MTok input, $0.15/MTok output
+- `gemini-2.5-flash-lite`: 1M context, cost-efficient option for high-volume workloads
 
 **Embedding Models (Direct API):**
-- `gemini-embedding-exp-03-07`: 3072 dimensions, 8K tokens input, **experimental** (announced March 2025)
-  - **Top MTEB Performance**: 68.32 mean score (+5.81 over next competitor)
-  - **Matryoshka Representation Learning**: Supports dimension truncation from 3K
-  - **Multilingual**: 100+ languages supported
-  - **Unified Model**: Surpasses previous task-specific models
-  - **Status**: Experimental with limited capacity, subject to change
-- `text-embedding-004`: 768 dimensions
-- `gemini-embedding-001`: 768 dimensions (legacy)
+- `gemini-embedding-001`: 3072 dimensions (default), configurable (768/1536/3072), MRL-trained
 
 **Notes on Vertex AI vs Direct API:**
 - **Vertex AI** offers additional specialized embedding models (`text-embedding-005`, `text-multilingual-embedding-002`)

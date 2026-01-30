@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
-import { OpenAIProvider } from '../../src/providers/openai.js';
+import { OpenAIProvider, EMBEDDING_MODELS, CHAT_MODELS } from '../../src/providers/openai.js';
 import { embedText, countTokens, configure } from '../../src/index.js';
 
 describe('OpenAIProvider', () => {
@@ -81,20 +81,24 @@ describe('OpenAIProvider', () => {
     });
 
     describe('Token Counting', () => {
-      it.skipIf(!hasApiKey)('should count tokens for chat models', async () => {
-        const count = await countTokens('openai/gpt-4o', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
+      it.skipIf(!hasApiKey)('should count tokens for all supported chat models', async () => {
+        for (const model of CHAT_MODELS) {
+          const count = await countTokens(`openai/${model}`, 'Hello world');
+          expect(count).toBeGreaterThan(0);
+          expect(typeof count).toBe('number');
+        }
       });
 
-      it.skipIf(!hasApiKey)('should count tokens for embedding models', async () => {
-        const count = await countTokens('openai/text-embedding-3-small', 'Hello world');
-        expect(count).toBeGreaterThan(0);
-        expect(typeof count).toBe('number');
+      it.skipIf(!hasApiKey)('should count tokens for all supported embedding models', async () => {
+        for (const model of EMBEDDING_MODELS) {
+          const count = await countTokens(`openai/${model}`, 'Hello world');
+          expect(count).toBeGreaterThan(0);
+          expect(typeof count).toBe('number');
+        }
       });
 
       it.skipIf(!hasApiKey)('should handle empty text', async () => {
-        const count = await countTokens('openai/gpt-4o', '');
+        const count = await countTokens('openai/gpt-5', '');
         expect(count).toBe(0);
       });
 
@@ -102,8 +106,8 @@ describe('OpenAIProvider', () => {
         const shortText = 'Hello';
         const longText = 'Hello world this is a longer sentence with more words.';
         
-        const shortCount = await countTokens('openai/gpt-4o', shortText);
-        const longCount = await countTokens('openai/gpt-4o', longText);
+        const shortCount = await countTokens('openai/gpt-5', shortText);
+        const longCount = await countTokens('openai/gpt-5', longText);
         
         expect(longCount).toBeGreaterThan(shortCount);
       });
@@ -126,11 +130,21 @@ describe('OpenAIProvider', () => {
 
       it.skipIf(!hasApiKey)('should generate embeddings for text-embedding-3-large', async () => {
         const result = await embedText('openai/text-embedding-3-large', 'Hello world');
-        
+
         expect(result.vector).toBeDefined();
         expect(Array.isArray(result.vector)).toBe(true);
         expect(result.vector.length).toBe(3072); // text-embedding-3-large dimension
         expect(result.model).toBe('openai/text-embedding-3-large');
+        expect(result.usage.tokens).toBeGreaterThan(0);
+      });
+
+      it.skipIf(!hasApiKey)('should generate embeddings for text-embedding-ada-002', async () => {
+        const result = await embedText('openai/text-embedding-ada-002', 'Hello world');
+
+        expect(result.vector).toBeDefined();
+        expect(Array.isArray(result.vector)).toBe(true);
+        expect(result.vector.length).toBe(1536); // text-embedding-ada-002 dimension
+        expect(result.model).toBe('openai/text-embedding-ada-002');
         expect(result.usage.tokens).toBeGreaterThan(0);
       });
 

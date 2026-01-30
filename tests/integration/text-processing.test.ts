@@ -16,21 +16,21 @@ describe('Text Processing Integration', () => {
 
   describe('Text Splitting', () => {
     it.skipIf(!hasOpenAIKey)('should return single chunk for short text (OpenAI)', async () => {
-      const chunks = await splitTextMaxTokens('Hello world', 'openai/gpt-4o', 100);
+      const chunks = await splitTextMaxTokens('Hello world', 'openai/gpt-5', 100);
       expect(chunks).toHaveLength(1);
       expect(chunks[0]).toBe('Hello world');
     });
 
     it.skipIf(!hasOpenAIKey)('should split long text into multiple chunks (OpenAI)', async () => {
       const longText = Array(100).fill('This is a sentence.').join(' ');
-      const chunks = await splitTextMaxTokens(longText, 'openai/gpt-4o', 50);
+      const chunks = await splitTextMaxTokens(longText, 'openai/gpt-5', 50);
       
       expect(chunks.length).toBeGreaterThan(1);
       
       // Verify each chunk is within token limit
       for (const chunk of chunks) {
         const { countTokens } = await import('../../src/index.js');
-        const tokenCount = await countTokens('openai/gpt-4o', chunk);
+        const tokenCount = await countTokens('openai/gpt-5', chunk);
         expect(tokenCount).toBeLessThanOrEqual(50);
       }
     });
@@ -54,13 +54,13 @@ describe('Text Processing Integration', () => {
     });
 
     it.skipIf(!hasOpenAIKey)('should handle empty text', async () => {
-      const chunks = await splitTextMaxTokens('', 'openai/gpt-4o', 100);
+      const chunks = await splitTextMaxTokens('', 'openai/gpt-5', 100);
       expect(chunks).toEqual([]);
     });
 
     it.skipIf(!hasOpenAIKey)('should preserve sentences when possible', async () => {
       const text = 'First sentence with many words to make it longer. Second sentence with many words to make it longer. Third sentence with many words to make it longer.';
-      const chunks = await splitTextMaxTokens(text, 'openai/gpt-4o', 15);
+      const chunks = await splitTextMaxTokens(text, 'openai/gpt-5', 15);
       
       expect(chunks.length).toBeGreaterThan(1);
       chunks.forEach(chunk => {
@@ -79,38 +79,38 @@ describe('Text Processing Integration', () => {
     ];
 
     it.skipIf(!hasOpenAIKey)('should return all messages if under limit (OpenAI)', async () => {
-      const trimmed = await trimMessages(testMessages, 'openai/gpt-4o', 1000);
+      const trimmed = await trimMessages(testMessages, 'openai/gpt-5', 1000);
       expect(trimmed).toHaveLength(testMessages.length);
     });
 
     it.skipIf(!hasOpenAIKey)('should preserve system messages by default (OpenAI)', async () => {
-      const trimmed = await trimMessages(testMessages, 'openai/gpt-4o', 10);
+      const trimmed = await trimMessages(testMessages, 'openai/gpt-5', 10);
       const systemMessages = trimmed.filter(m => m.role === 'system');
       const originalSystemMessages = testMessages.filter(m => m.role === 'system');
       expect(systemMessages).toHaveLength(originalSystemMessages.length);
     });
 
     it.skipIf(!hasOpenAIKey)('should trim with early strategy (OpenAI)', async () => {
-      const trimmed = await trimMessages(testMessages, 'openai/gpt-4o', 25, { strategy: 'early' });
+      const trimmed = await trimMessages(testMessages, 'openai/gpt-5', 25, { strategy: 'early' });
       expect(trimmed.length).toBeLessThan(testMessages.length);
       
       // Verify total tokens are within limit
       const { countTokens } = await import('../../src/index.js');
       const totalTokens = await Promise.all(
-        trimmed.map(msg => countTokens('openai/gpt-4o', msg.content))
+        trimmed.map(msg => countTokens('openai/gpt-5', msg.content))
       ).then(counts => counts.reduce((sum, count) => sum + count, 0));
       
       expect(totalTokens).toBeLessThanOrEqual(25);
     });
 
     it.skipIf(!hasOpenAIKey)('should trim with late strategy (OpenAI)', async () => {
-      const trimmed = await trimMessages(testMessages, 'openai/gpt-4o', 25, { strategy: 'late' });
+      const trimmed = await trimMessages(testMessages, 'openai/gpt-5', 25, { strategy: 'late' });
       expect(trimmed.length).toBeLessThan(testMessages.length);
       
       // Verify total tokens are within limit
       const { countTokens } = await import('../../src/index.js');
       const totalTokens = await Promise.all(
-        trimmed.map(msg => countTokens('openai/gpt-4o', msg.content))
+        trimmed.map(msg => countTokens('openai/gpt-5', msg.content))
       ).then(counts => counts.reduce((sum, count) => sum + count, 0));
       
       expect(totalTokens).toBeLessThanOrEqual(25);
@@ -140,7 +140,7 @@ describe('Text Processing Integration', () => {
     });
 
     it.skipIf(!hasOpenAIKey)('should handle empty messages array', async () => {
-      const trimmed = await trimMessages([], 'openai/gpt-4o', 100);
+      const trimmed = await trimMessages([], 'openai/gpt-5', 100);
       expect(trimmed).toEqual([]);
     });
   });
