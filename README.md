@@ -347,8 +347,8 @@ OpenAI models add extra tokens for chat formatting:
 **Official Documentation:** [Vertex AI Embeddings](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/embeddings) | [Text Embeddings API](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings-api)
 
 **Embedding Models:**
-- `vertex/gemini-embedding-001` - configurable dimensions (3072 default) (2K tokens context) - $0.00015/1K tokens
-- `vertex/text-embedding-005` - 768 dimensions (2K tokens context) - $0.000025/1K chars - Latest specialized model, English/code optimized
-- `vertex/text-multilingual-embedding-002` - 768 dimensions (2K tokens context) - $0.000025/1K chars - Multilingual support (100+ languages)
+- `vertex/gemini-embedding-001` - configurable dimensions (3072 default) (2K tokens context) - $0.15/1M tokens
+- `vertex/text-embedding-005` - 768 dimensions (2K tokens context) - $0.025/1M chars - Latest specialized model, English/code optimized
+- `vertex/text-multilingual-embedding-002` - 768 dimensions (2K tokens context) - $0.025/1M chars - Multilingual support (100+ languages)
 
 *Note: Vertex AI models support embeddings only (no tokenization capabilities). Vertex AI provides the most cost-effective embedding options.*
