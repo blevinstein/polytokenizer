@@ -1,4 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
+import { backOff } from 'exponential-backoff';
+import { LRUCache } from 'lru-cache';
 import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
 export const EMBEDDING_MODELS = [
@@ -24,9 +26,14 @@ const EMBEDDING_TO_TOKENIZER_MODEL = {
 
 export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
   private client: GoogleGenAI;
+  private tokenCountCache: LRUCache<string, number>;
 
   constructor(apiKey: string) {
     this.client = new GoogleGenAI({ apiKey });
+    // Cache up to 10,000 token count results
+    this.tokenCountCache = new LRUCache<string, number>({
+      max: 10000,
+    });
   }
 
   async embed(text: string, model: string, dimensions?: number): Promise<EmbeddingResult> {
@@ -82,12 +89,37 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
     // only accepts chat model names for countTokens
     const tokenizerModel = this.getTokenizerModel(model);
 
+    // Check cache first
+    const cacheKey = `${tokenizerModel}:${text}`;
+    const cachedResult = this.tokenCountCache.get(cacheKey);
+    if (cachedResult !== undefined) {
+      return cachedResult;
+    }
+
     try {
-      const response = await this.client.models.countTokens({
-        model: tokenizerModel,
-        contents: text,
-      });
-      return response.totalTokens || 0;
+      // Use exponential backoff for retryable errors (rate limits, server errors)
+      const response = await backOff(
+        () => this.client.models.countTokens({
+          model: tokenizerModel,
+          contents: text,
+        }),
+        {
+          numOfAttempts: 3,
+          startingDelay: 1000,
+          timeMultiple: 2,
+          retry: (error: any) => {
+            // Retry on rate limits (429) and server errors (500+)
+            const status = error?.status || error?.statusCode;
+            return status === 429 || (status >= 500 && status < 600);
+          },
+        }
+      );
+      const tokenCount = response.totalTokens || 0;
+
+      // Cache the result
+      this.tokenCountCache.set(cacheKey, tokenCount);
+
+      return tokenCount;
     } catch (error: any) {
       if (error.code) {
         throw error;

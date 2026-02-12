@@ -51,6 +51,13 @@ export interface SplitTextOptions {
   preserveSentences?: boolean;
   preserveWords?: boolean;
   overlap?: number;
+  /**
+   * Maximum number of concurrent token counting requests when splitting text.
+   * Lower values reduce API load but increase processing time.
+   * Higher values speed up processing but may cause rate limiting or connection issues.
+   * Default: 5
+   */
+  maxConcurrency?: number;
 }
 
 export interface TruncateOptions {

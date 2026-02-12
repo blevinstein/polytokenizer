@@ -157,7 +157,7 @@ function estimateTokens(text: string): number {
 }
 
 export async function splitTextMaxTokens(text: string, model: string, maxTokens: number, options: SplitTextOptions = {}): Promise<string[]> {
-  const { preserveSentences = true, preserveWords = true } = options;
+  const { preserveSentences = true, preserveWords = true, maxConcurrency = 5 } = options;
 
   if (!text || maxTokens <= 0) {
     return text ? [text] : [];
@@ -179,13 +179,13 @@ export async function splitTextMaxTokens(text: string, model: string, maxTokens:
 
   // Splitters are used in order (earlier splitters are preferred)
   for (const splitter of splitters) {
-    parts = await async.flatMap(parts, async (part: { text: string; tokens: number }) => {
+    parts = await async.flatMapSeries(parts, async (part: { text: string; tokens: number }) => {
       // Parts which are already under max tokens are returned as-is
       if (part.tokens <= maxTokens) return [part];
 
-      // Split larger part into segments and count the tokens for each segment
-      return await async.map(
+      return await async.mapLimit(
         part.text.split(splitter),
+        maxConcurrency,
         async (segment: string) => ({ text: segment, tokens: await tryCountTokens(model, segment) }));
     });
   }
