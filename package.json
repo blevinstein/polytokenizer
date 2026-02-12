@@ -21,7 +21,9 @@
     "test:coverage": "vitest --coverage --run",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "count-tokens": "dotenv -- tsx scripts/count-tokens.ts",
+    "embed": "dotenv -- tsx scripts/embed-text.ts"
   },
   "keywords": [
     "tokenizer",
@@ -52,6 +54,7 @@
     "dotenv": "^16.4.7",
     "dotenv-cli": "^8.0.0",
     "eslint": "^9.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.6.0",
     "vitest": "^2.0.0"
   },
