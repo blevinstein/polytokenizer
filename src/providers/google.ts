@@ -12,6 +12,16 @@ export const CHAT_MODELS = [
   'gemini-2.5-pro',             // Pro model - best for complex tasks
 ] as const;
 
+/**
+ * Maps embedding models to their corresponding chat models for tokenization.
+ * Gemini embedding models use the same tokenizer as Gemini chat models,
+ * but the countTokens API only accepts chat model names.
+ * This mapping is used internally to convert embedding model names to chat model names.
+ */
+const EMBEDDING_TO_TOKENIZER_MODEL = {
+  'gemini-embedding-001': 'gemini-2.5-flash',
+} as const;
+
 export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
   private client: GoogleGenAI;
 
@@ -62,9 +72,19 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
   }
 
   async countTokens(model: string, text: string): Promise<number> {
+    // Return 0 for empty text
+    if (!text || text.trim().length === 0) {
+      return 0;
+    }
+
+    // Convert embedding models to their corresponding chat models for tokenization
+    // Gemini embedding models use the same tokenizer as chat models, but the API
+    // only accepts chat model names for countTokens
+    const tokenizerModel = this.getTokenizerModel(model);
+
     try {
       const response = await this.client.models.countTokens({
-        model,
+        model: tokenizerModel,
         contents: text,
       });
       return response.totalTokens || 0;
@@ -80,6 +100,25 @@ export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {
         error.status
       );
     }
+  }
+
+  /**
+   * Gets the appropriate model name for tokenization.
+   * If the model is an embedding model, returns the corresponding chat model.
+   * Otherwise, returns the model as-is.
+   */
+  private getTokenizerModel(model: string): string {
+    if ((EMBEDDING_MODELS as readonly string[]).includes(model)) {
+      const tokenizerModel = EMBEDDING_TO_TOKENIZER_MODEL[model as keyof typeof EMBEDDING_TO_TOKENIZER_MODEL];
+      if (!tokenizerModel) {
+        throw this.createError(
+          'INVALID_MODEL',
+          `Embedding model ${model} does not have a corresponding tokenizer model configured`
+        );
+      }
+      return tokenizerModel;
+    }
+    return model;
   }
 
   getTokenizer(model: string): TokenizerInterface {

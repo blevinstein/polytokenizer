@@ -172,10 +172,10 @@ describe('GoogleProvider', () => {
 
       it.skipIf(!hasApiKey)('should count tokens consistently across models', async () => {
         const text = 'The quick brown fox jumps over the lazy dog.';
-        
+
         const countFlash = await countTokens('google/gemini-2.5-flash', text);
         const countPro = await countTokens('google/gemini-2.5-pro', text);
-        
+
         expect(countFlash).toBeGreaterThan(0);
         expect(countPro).toBeGreaterThan(0);
       });
@@ -184,6 +184,37 @@ describe('GoogleProvider', () => {
         const text = 'Code: const x = {"key": "value"}; // comment';
         const count = await countTokens('google/gemini-2.5-pro', text);
         expect(count).toBeGreaterThan(0);
+      });
+    });
+
+    describe('Embedding Model Token Counting', () => {
+      it.skipIf(!hasApiKey)('should count tokens for embedding models using chat model tokenizer', async () => {
+        const text = 'Hello world';
+        const count = await countTokens('google/gemini-embedding-001', text);
+
+        expect(count).toBeGreaterThan(0);
+        expect(typeof count).toBe('number');
+      });
+
+      it.skipIf(!hasApiKey)('should produce consistent token counts between embedding and chat models', async () => {
+        const text = 'The quick brown fox jumps over the lazy dog.';
+
+        // Since embedding models use the same tokenizer as chat models,
+        // token counts should be identical
+        const embeddingCount = await countTokens('google/gemini-embedding-001', text);
+        const chatCount = await countTokens('google/gemini-2.5-flash', text);
+
+        expect(embeddingCount).toBe(chatCount);
+      });
+
+      it.skipIf(!hasApiKey)('should handle empty text for embedding models', async () => {
+        const count = await countTokens('google/gemini-embedding-001', '');
+        expect(count).toBe(0);
+      });
+
+      it.skipIf(!hasApiKey)('should handle whitespace-only text for embedding models', async () => {
+        const count = await countTokens('google/gemini-embedding-001', '   \n\t  ');
+        expect(count).toBe(0);
       });
     });
   });
