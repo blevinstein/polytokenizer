@@ -137,11 +137,14 @@ export async function countTokens(model: string, text: string): Promise<number> 
 export async function tryCountTokens(model: string, text: string): Promise<number> {
   try {
     return await countTokens(model, text);
-  } catch (error) {
+  } catch (error: any) {
     const errorInfo = error instanceof Error ? error.message : String(error);
     const textPreview = text.length > 100 ? `${text.substring(0, 100)}...` : text;
     console.error(`Failed to countTokens for model '${model}':`, {
       error: errorInfo,
+      code: error.code,
+      statusCode: error.statusCode,
+      retryable: error.retryable,
       textLength: text.length,
       textPreview,
     });
