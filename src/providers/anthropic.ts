@@ -14,7 +14,11 @@ interface AnthropicCountTokensResponse {
 }
 
 export const SUPPORTED_MODELS = [
-  // Claude 4.5 series (current)
+  // Claude 4.7 series (current)
+  'claude-opus-4-7',
+  // Claude 4.6 series (current)
+  'claude-sonnet-4-6',
+  // Claude 4.5 series
   'claude-sonnet-4-5',
   'claude-haiku-4-5',
   'claude-opus-4-5',

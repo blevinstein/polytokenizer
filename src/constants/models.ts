@@ -25,7 +25,13 @@ export const CONTEXT_LIMITS = {
   'openai/o1': 200_000,
   'openai/o1-mini': 128_000,
 
-  // Anthropic - Claude 4.5 series (current)
+  // Anthropic - Claude 4.7 series (current)
+  'anthropic/claude-opus-4-7': 1_000_000,
+
+  // Anthropic - Claude 4.6 series (current)
+  'anthropic/claude-sonnet-4-6': 1_000_000,
+
+  // Anthropic - Claude 4.5 series
   'anthropic/claude-sonnet-4-5': 200_000,
   'anthropic/claude-haiku-4-5': 200_000,
   'anthropic/claude-opus-4-5': 200_000,

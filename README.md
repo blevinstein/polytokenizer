@@ -312,7 +312,13 @@ OpenAI models add extra tokens for chat formatting:
 
 **Official Documentation:** [Anthropic Models Overview](https://docs.anthropic.com/en/docs/about-claude/models/overview)
 
-**Claude 4.5 Series (Current):**
+**Claude 4.7 Series (Current):**
+- `anthropic/claude-opus-4-7` - Claude Opus 4.7 (1M context) — uses a new tokenizer; may produce ~35% more tokens than prior models for the same text
+
+**Claude 4.6 Series (Current):**
+- `anthropic/claude-sonnet-4-6` - Claude Sonnet 4.6 (1M context)
+
+**Claude 4.5 Series:**
 - `anthropic/claude-opus-4-5` - Claude 4.5 Opus (200K context)
 - `anthropic/claude-sonnet-4-5` - Claude 4.5 Sonnet (200K context)
 - `anthropic/claude-haiku-4-5` - Claude 4.5 Haiku (200K context)

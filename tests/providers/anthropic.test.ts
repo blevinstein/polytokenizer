@@ -118,6 +118,12 @@ describe('AnthropicProvider', () => {
         expect(typeof count).toBe('number');
       });
 
+      it.skipIf(!hasApiKey)('should count tokens for claude-opus-4-7 model', async () => {
+        const count = await countTokens('anthropic/claude-opus-4-7', 'Hello world');
+        expect(count).toBeGreaterThan(0);
+        expect(typeof count).toBe('number');
+      });
+
       it.skipIf(!hasApiKey)('should handle large payloads and find failure point above 10k tokens', async () => {
         // Base text pattern to repeat for generating large payloads
         const baseText = 'This is a sample sentence with various words and punctuation marks. ';
