@@ -1,0 +1,133 @@
+name: Quarterly model update
+
+# Every 3 months, runs Claude Code to refresh the supported model list
+# (new models, deprecations, context sizes, pricing) and opens a PR for review.
+#
+# Setup (repo Settings):
+# - Secrets and variables > Actions: add ANTHROPIC_API_KEY (required).
+#   OPENAI_API_KEY, GEMINI_API_KEY, GCP_API_KEY are optional and let the
+#   integration tests check new models against the real APIs.
+# - Actions > General > Workflow permissions: enable
+#   "Allow GitHub Actions to create and approve pull requests".
+# Run it on demand from the Actions tab via "Run workflow".
+
+on:
+  schedule:
+    # 14:00 UTC on Jan 1, Apr 1, Jul 1, Oct 1
+    - cron: "0 14 1 1,4,7,10 *"
+  workflow_dispatch:
+
+concurrency:
+  group: quarterly-model-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-models:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PR_BODY_FILE: .model-update-pr-body.md
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        env:
+          # Optional provider keys: when set, integration tests exercise the real
+          # APIs so new model IDs are verified end to end. Missing keys are skipped.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GCP_API_KEY: ${{ secrets.GCP_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --max-turns 150
+            --allowedTools "Read,Edit,Write,Glob,Grep,WebFetch,WebSearch,Bash(yarn build),Bash(yarn test:*),Bash(yarn test),Bash(npx vitest:*),Bash(git diff:*),Bash(git status:*),Bash(git log:*)"
+          prompt: |
+            You are doing the scheduled quarterly maintenance of polytokenizer's
+            supported model list. Today is the start of a new quarter.
+
+            Follow the "Updating Supported Models" section of CLAUDE.md exactly:
+            consult each official documentation source listed there (use WebFetch,
+            and WebSearch if a page fails to load) and bring the repo up to date.
+
+            IN SCOPE (mechanical, straightforward changes only):
+            - Add newly released models for providers and model families the
+              library already supports (chat/tokenization models and embedding models).
+            - Remove models that the provider has shut down / retired, and mark or
+              note models that are announced as deprecated.
+            - Correct context window sizes, max output sizes, embedding dimensions,
+              tokenizer mappings, and pricing that have changed.
+            - Update README.md, src/constants/models.ts, src/types/index.ts, the
+              provider files, and tests as CLAUDE.md describes, following the
+              existing code style and structure.
+
+            OUT OF SCOPE (do NOT implement; list them as suggestions instead):
+            - New providers, new features, API changes, refactors, dependency
+              upgrades, version bumps in package.json, or anything requiring a
+              design decision.
+            - Anything you are not confident about from official sources. Never
+              guess a model ID, context size, or price; if a source is ambiguous or
+              unreachable, leave the existing value and call it out.
+
+            VERIFY before finishing:
+            - `yarn build` must succeed.
+            - `yarn test:unit` must pass.
+            - Run `yarn test` too; integration tests auto-skip providers without
+              keys. If a new model fails against a real API, drop that model and
+              note why.
+
+            Do NOT run git commit, git push, or create branches/PRs; a later
+            workflow step commits your working-tree changes and opens the PR.
+
+            Finally, write a PR description to `${{ env.PR_BODY_FILE }}` in the repo
+            root (it will not be committed) with these sections:
+            ## Summary  — one or two sentences.
+            ## Changes  — a table or list per provider: added / removed / updated,
+              each with the source URL that justifies it.
+            ## Verification  — which build/test commands ran and their results,
+              and which integration suites were skipped for missing keys.
+            ## Needs attention  — ambiguous data, unreachable sources, anything
+              you left unchanged on purpose.
+            ## Suggested follow-ups (not implemented)  — non-mechanical improvements
+              you noticed that need the maintainer's approval.
+            If nothing needs changing, make no code edits and still write the file
+            explaining what was checked.
+
+      - name: Prepare PR body
+        id: body
+        run: |
+          if [ -f "$PR_BODY_FILE" ]; then
+            mv "$PR_BODY_FILE" "$RUNNER_TEMP/pr-body.md"
+          else
+            echo "Automated quarterly model update. (Claude did not produce a summary; see the workflow run logs.)" > "$RUNNER_TEMP/pr-body.md"
+          fi
+          echo "" >> "$RUNNER_TEMP/pr-body.md"
+          echo "---" >> "$RUNNER_TEMP/pr-body.md"
+          echo "Generated by the [quarterly model update workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." >> "$RUNNER_TEMP/pr-body.md"
+          echo "path=$RUNNER_TEMP/pr-body.md" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/quarterly-model-update
+          delete-branch: true
+          commit-message: "Quarterly supported model update"
+          title: "Quarterly supported model update"
+          body-path: ${{ steps.body.outputs.path }}
+          assignees: blevinstein
+          reviewers: blevinstein
+          labels: automated
