@@ -59,6 +59,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
             --max-turns 150
+            --verbose
             --allowedTools "Read,Edit,Write,Glob,Grep,WebFetch,WebSearch,Bash(yarn build),Bash(yarn test:*),Bash(yarn test),Bash(npx vitest:*),Bash(git diff:*),Bash(git status:*),Bash(git log:*)"
           prompt: |
             You are doing the scheduled quarterly maintenance of polytokenizer's
@@ -111,10 +112,38 @@ jobs:
             If nothing needs changing, make no code edits and still write the file
             explaining what was checked.
 
-      - name: Prepare PR body
-        id: body
+      - name: Log and capture artifacts
+        if: always()
         run: |
           if [ -f "$PR_BODY_FILE" ]; then
+            echo "::group::PR Body"
+            cat "$PR_BODY_FILE"
+            echo "::endgroup::"
+            cp "$PR_BODY_FILE" "$RUNNER_TEMP/pr-body.md"
+          else
+            echo "No PR body file found (Claude did not write $PR_BODY_FILE)."
+          fi
+
+          echo "::group::Git diff (stat)"
+          git diff --stat
+          echo "::endgroup::"
+
+          git diff > "$RUNNER_TEMP/changes.diff"
+          if [ -s "$RUNNER_TEMP/changes.diff" ]; then
+            echo "::group::Git diff (full)"
+            cat "$RUNNER_TEMP/changes.diff"
+            echo "::endgroup::"
+          else
+            echo "No uncommitted changes in working tree."
+          fi
+
+      - name: Prepare PR body
+        id: body
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pr-body.md" ]; then
+            : # already copied by the log step above
+          elif [ -f "$PR_BODY_FILE" ]; then
             mv "$PR_BODY_FILE" "$RUNNER_TEMP/pr-body.md"
           else
             echo "Automated quarterly model update. (Claude did not produce a summary; see the workflow run logs.)" > "$RUNNER_TEMP/pr-body.md"
@@ -135,3 +164,13 @@ jobs:
           assignees: blevinstein
           reviewers: blevinstein
           labels: automated
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-update-artifacts
+          path: |
+            ${{ runner.temp }}/pr-body.md
+            ${{ runner.temp }}/changes.diff
+          if-no-files-found: ignore
