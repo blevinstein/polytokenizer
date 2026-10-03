@@ -210,7 +210,7 @@ describe('GoogleProvider', () => {
         // Since embedding models use the same tokenizer as chat models,
         // token counts should be identical
         const embeddingCount = await countTokens('google/gemini-embedding-001', text);
-        const chatCount = await countTokens('google/gemini-2.5-flash', text);
+        const chatCount = await countTokens('google/gemini-3.8-flash', text);
 
         expect(embeddingCount).toBe(chatCount);
       });

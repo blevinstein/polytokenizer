@@ -28,7 +28,7 @@ export const CHAT_MODELS = [
  * This mapping is used internally to convert embedding model names to chat model names.
  */
 const EMBEDDING_TO_TOKENIZER_MODEL = {
-  'gemini-embedding-001': 'gemini-2.5-flash',
+  'gemini-embedding-001': 'gemini-3.8-flash',
 } as const;
 
 export class GoogleProvider implements EmbeddingProvider, TokenizerProvider {

@@ -142,7 +142,9 @@ describe('AnthropicProvider', () => {
             lastSuccessfulSize = count;
             currentMultiplier *= 10;
           } catch (error) {
-            if (error.statusCode === 413) {
+            if (error.statusCode === 413 || lastSuccessfulSize > 0) {
+              // Either a payload-too-large response, or a network/connection failure
+              // after already succeeding with a large payload — treat as the limit.
               break;
             } else {
               throw error;
