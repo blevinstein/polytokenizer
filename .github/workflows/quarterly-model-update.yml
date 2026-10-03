@@ -60,7 +60,6 @@ jobs:
           show_full_output: true
           claude_args: |
             --max-turns 150
-            --verbose
             --allowedTools "Read,Edit,Write,Glob,Grep,WebFetch,WebSearch,Bash(yarn build),Bash(yarn test:*),Bash(yarn test),Bash(npx vitest:*),Bash(git diff:*),Bash(git status:*),Bash(git log:*)"
           prompt: |
             You are doing the scheduled quarterly maintenance of polytokenizer's
