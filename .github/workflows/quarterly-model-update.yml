@@ -5,8 +5,10 @@ name: Quarterly model update
 #
 # Setup (repo Settings):
 # - Secrets and variables > Actions: add ANTHROPIC_API_KEY (required).
-#   OPENAI_API_KEY, GEMINI_API_KEY, GCP_API_KEY are optional and let the
-#   integration tests check new models against the real APIs.
+#   Optional, so integration tests check new models against the real APIs:
+#   OPENAI_API_KEY, GEMINI_API_KEY, and for Vertex AI VERTEX_PROJECT_ID +
+#   VERTEX_CREDENTIALS (service account JSON) + VERTEX_LOCATION (defaults to
+#   us-central1).
 # - Actions > General > Workflow permissions: enable
 #   "Allow GitHub Actions to create and approve pull requests".
 # Run it on demand from the Actions tab via "Run workflow".
@@ -48,7 +50,9 @@ jobs:
           # APIs so new model IDs are verified end to end. Missing keys are skipped.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GCP_API_KEY: ${{ secrets.GCP_API_KEY }}
+          VERTEX_PROJECT_ID: ${{ secrets.VERTEX_PROJECT_ID }}
+          VERTEX_LOCATION: ${{ secrets.VERTEX_LOCATION }}
+          VERTEX_CREDENTIALS: ${{ secrets.VERTEX_CREDENTIALS }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
