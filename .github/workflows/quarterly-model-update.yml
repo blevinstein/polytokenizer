@@ -50,8 +50,8 @@ jobs:
           # APIs so new model IDs are verified end to end. Missing keys are skipped.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          VERTEX_PROJECT_ID: ${{ secrets.VERTEX_PROJECT_ID }}
-          VERTEX_LOCATION: ${{ secrets.VERTEX_LOCATION }}
+          VERTEX_PROJECT_ID: ${{ vars.VERTEX_PROJECT_ID }}
+          VERTEX_LOCATION: ${{ vars.VERTEX_LOCATION }}
           VERTEX_CREDENTIALS: ${{ secrets.VERTEX_CREDENTIALS }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
