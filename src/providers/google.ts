@@ -4,6 +4,7 @@ import { LRUCache } from 'lru-cache';
 import type { EmbeddingResult, EmbeddingProvider, TokenizerProvider, TokenizerInterface, ProviderError } from '../types/index.js';
 
 export const EMBEDDING_MODELS = [
+  'gemini-embedding-2',         // 3072 dimensions (default), configurable (128-3072), 8K input, multimodal
   'gemini-embedding-001',       // 3072 dimensions (default), configurable (768/1536/3072), MRL-trained
 ] as const;
 
@@ -28,6 +29,7 @@ export const CHAT_MODELS = [
  * This mapping is used internally to convert embedding model names to chat model names.
  */
 const EMBEDDING_TO_TOKENIZER_MODEL = {
+  'gemini-embedding-2': 'gemini-3.8-flash',
   'gemini-embedding-001': 'gemini-3.8-flash',
 } as const;
 

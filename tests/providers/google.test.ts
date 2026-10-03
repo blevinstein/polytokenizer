@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { GoogleProvider, EMBEDDING_MODELS, CHAT_MODELS } from '../../src/providers/google.js';
-import { embedText, countTokens, configure, CONTEXT_LIMITS } from '../../src/index.js';
+import { embedText, countTokens, configure, CONTEXT_LIMITS, EMBEDDING_LIMITS, EMBEDDING_DIMENSIONS } from '../../src/index.js';
 
 describe('GoogleProvider', () => {
   let provider: GoogleProvider;
@@ -31,6 +31,13 @@ describe('GoogleProvider', () => {
       it('should have a context limit for every supported chat model', () => {
         for (const model of CHAT_MODELS) {
           expect(CONTEXT_LIMITS[`google/${model}` as keyof typeof CONTEXT_LIMITS]).toBeGreaterThan(0);
+        }
+      });
+
+      it('should have limits and dimensions for every supported embedding model', () => {
+        for (const model of EMBEDDING_MODELS) {
+          expect(EMBEDDING_LIMITS[`google/${model}` as keyof typeof EMBEDDING_LIMITS]).toBeGreaterThan(0);
+          expect(EMBEDDING_DIMENSIONS[`google/${model}` as keyof typeof EMBEDDING_DIMENSIONS]).toBeGreaterThan(0);
         }
       });
     });
@@ -100,6 +107,21 @@ describe('GoogleProvider', () => {
         expect(result.model).toBe('google/gemini-embedding-001');
       });
 
+      it.skipIf(!hasApiKey)('should generate embeddings with gemini-embedding-2 (default 3072 dimensions)', async () => {
+        const result = await embedText('google/gemini-embedding-2', 'Hello world');
+
+        expect(result.vector).toBeDefined();
+        expect(Array.isArray(result.vector)).toBe(true);
+        expect(result.vector.length).toBe(3072); // Default dimension for gemini-embedding-2
+        expect(result.model).toBe('google/gemini-embedding-2');
+      });
+
+      it.skipIf(!hasApiKey)('should generate embeddings with gemini-embedding-2 using 768 dimensions', async () => {
+        const result = await embedText('google/gemini-embedding-2', 'Hello world', 768);
+
+        expect(result.vector.length).toBe(768);
+        expect(result.model).toBe('google/gemini-embedding-2');
+      });
 
       it.skipIf(!hasApiKey)('should handle different text inputs', async () => {
         const shortResult = await embedText('google/gemini-embedding-001', 'Hi');
@@ -202,6 +224,9 @@ describe('GoogleProvider', () => {
 
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
+
+        const count2 = await countTokens('google/gemini-embedding-2', text);
+        expect(count2).toBeGreaterThan(0);
       });
 
       it.skipIf(!hasApiKey)('should produce consistent token counts between embedding and chat models', async () => {

@@ -362,6 +362,7 @@ OpenAI models add extra tokens for chat formatting:
 - `google/gemini-2.5-flash-lite` - Gemini 2.5 Flash Lite (1M context) - cost efficient
 
 **Embedding Models:**
+- `google/gemini-embedding-2` - configurable dimensions (3072 default) (8K tokens context) - latest, multimodal; embedding space incompatible with `gemini-embedding-001`
 - `google/gemini-embedding-001` - configurable dimensions (3072 default) (2K tokens context)
 
 ### Vertex AI Models

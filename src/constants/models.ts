@@ -74,6 +74,7 @@ export const EMBEDDING_MODELS = [
   'openai/text-embedding-ada-002',
   
   // Google Embedding models (Gemini API)
+  'google/gemini-embedding-2',
   'google/gemini-embedding-001',
 
   // Vertex AI Embedding models
@@ -99,6 +100,7 @@ export const EMBEDDING_LIMITS = {
   'openai/text-embedding-ada-002': 8_192,
   
   // Google Embedding models (Gemini API)
+  'google/gemini-embedding-2': 8_192,
   'google/gemini-embedding-001': 2_048,
 
   // Vertex AI Embedding models
@@ -114,6 +116,7 @@ export const EMBEDDING_DIMENSIONS = {
   'openai/text-embedding-ada-002': 1536,
   
   // Google Embedding models (Gemini API)
+  'google/gemini-embedding-2': 3072,    // Default dimension, configurable (128-3072)
   'google/gemini-embedding-001': 3072,  // Default dimension, configurable (768/1536/3072)
 
   // Vertex AI Embedding models
