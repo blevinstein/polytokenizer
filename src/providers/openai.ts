@@ -9,16 +9,23 @@ export const EMBEDDING_MODELS = [
 ] as const;
 
 export const CHAT_MODELS = [
-  // GPT-5 series (current)
+  // GPT-5.6 series (current)
+  'gpt-5.6-sol',
+  'gpt-5.6-terra',
+  'gpt-5.6-luna',
+  // GPT-5.5 / GPT-5.4 series
+  'gpt-5.5',
+  'gpt-5.4',
+  'gpt-5.4-mini',
+  // GPT-5 series (previous generation)
   'gpt-5.2',
-  'gpt-5.1',
-  'gpt-5',
-  'gpt-5-mini',
-  'gpt-5-nano',
+  'gpt-5.1',      // Deprecated
+  'gpt-5',        // Deprecated
+  'gpt-5-mini',   // Deprecated
+  'gpt-5-nano',   // Deprecated
   // O-series reasoning models
-  'o3',
-  'o1',
-  'o1-mini',
+  'o3',           // Deprecated
+  'o1',           // Deprecated
 ] as const;
 
 const EMBEDDING_COSTS = {

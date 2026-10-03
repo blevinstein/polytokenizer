@@ -8,10 +8,17 @@ export const EMBEDDING_MODELS = [
 ] as const;
 
 export const CHAT_MODELS = [
-  // Gemini 2.5 series (current - recommended)
-  'gemini-2.5-flash',           // Current flash model
-  'gemini-2.5-flash-lite',      // Lite flash model - cost efficient
-  'gemini-2.5-pro',             // Pro model - best for complex tasks
+  // Gemini 3 series (current - recommended)
+  'gemini-3.8-flash',           // Latest flash model
+  'gemini-3.7-flash',
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  'gemini-3.5-flash-lite',      // Lite flash model - cost efficient
+  'gemini-3.1-flash-lite',
+  // Gemini 2.5 series (access limited to existing users)
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-pro',
 ] as const;
 
 /**

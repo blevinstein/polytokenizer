@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { GoogleProvider, EMBEDDING_MODELS, CHAT_MODELS } from '../../src/providers/google.js';
-import { embedText, countTokens, configure } from '../../src/index.js';
+import { embedText, countTokens, configure, CONTEXT_LIMITS } from '../../src/index.js';
 
 describe('GoogleProvider', () => {
   let provider: GoogleProvider;
@@ -27,6 +27,12 @@ describe('GoogleProvider', () => {
         expect(tokenizer).toBeDefined();
         expect(typeof tokenizer.count).toBe('function');
       });
+
+      it('should have a context limit for every supported chat model', () => {
+        for (const model of CHAT_MODELS) {
+          expect(CONTEXT_LIMITS[`google/${model}` as keyof typeof CONTEXT_LIMITS]).toBeGreaterThan(0);
+        }
+      });
     });
   });
 
@@ -41,13 +47,13 @@ describe('GoogleProvider', () => {
 
     describe('Token Counting', () => {
       it.skipIf(!hasApiKey)('should count tokens for Gemini chat models', async () => {
-        const count = await countTokens('google/gemini-2.5-pro', 'Hello world');
+        const count = await countTokens('google/gemini-3.8-flash', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
 
-      it.skipIf(!hasApiKey)('should count tokens for Gemini flash models', async () => {
-        const count = await countTokens('google/gemini-2.5-flash', 'Hello world');
+      it.skipIf(!hasApiKey)('should count tokens for Gemini flash-lite models', async () => {
+        const count = await countTokens('google/gemini-3.5-flash-lite', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
@@ -56,8 +62,8 @@ describe('GoogleProvider', () => {
         const shortText = 'Hello';
         const longText = 'Hello world this is a longer sentence with more words and punctuation!';
 
-        const shortCount = await countTokens('google/gemini-2.5-pro', shortText);
-        const longCount = await countTokens('google/gemini-2.5-pro', longText);
+        const shortCount = await countTokens('google/gemini-3.8-flash', shortText);
+        const longCount = await countTokens('google/gemini-3.8-flash', longText);
 
         expect(longCount).toBeGreaterThan(shortCount);
       });
@@ -163,7 +169,9 @@ describe('GoogleProvider', () => {
 
     describe('Chat Model Token Counting', () => {
       it.skipIf(!hasApiKey)('should count tokens for all supported chat models', async () => {
-        for (const model of CHAT_MODELS) {
+        // Gemini 2.5 models are only available to API users who have used them before,
+        // so they return 404 for newer API keys and are excluded here.
+        for (const model of CHAT_MODELS.filter(m => !m.startsWith('gemini-2.5'))) {
           const count = await countTokens(`google/${model}`, 'Hello world');
           expect(count).toBeGreaterThan(0);
           expect(typeof count).toBe('number');
@@ -173,16 +181,16 @@ describe('GoogleProvider', () => {
       it.skipIf(!hasApiKey)('should count tokens consistently across models', async () => {
         const text = 'The quick brown fox jumps over the lazy dog.';
 
-        const countFlash = await countTokens('google/gemini-2.5-flash', text);
-        const countPro = await countTokens('google/gemini-2.5-pro', text);
+        const countFlash = await countTokens('google/gemini-3.8-flash', text);
+        const countFlashLite = await countTokens('google/gemini-3.5-flash-lite', text);
 
         expect(countFlash).toBeGreaterThan(0);
-        expect(countPro).toBeGreaterThan(0);
+        expect(countFlashLite).toBeGreaterThan(0);
       });
 
       it.skipIf(!hasApiKey)('should handle special characters in token counting', async () => {
         const text = 'Code: const x = {"key": "value"}; // comment';
-        const count = await countTokens('google/gemini-2.5-pro', text);
+        const count = await countTokens('google/gemini-3.8-flash', text);
         expect(count).toBeGreaterThan(0);
       });
     });

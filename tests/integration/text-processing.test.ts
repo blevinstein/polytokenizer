@@ -37,7 +37,7 @@ describe('Text Processing Integration', () => {
 
     it.skipIf(!hasGoogleKey)('should work with Google models', async () => {
       const text = 'Test sentence for splitting with Google models and API integration.';
-      const chunks = await splitTextMaxTokens(text, 'google/gemini-2.5-flash', 10);
+      const chunks = await splitTextMaxTokens(text, 'google/gemini-3.8-flash', 10);
 
       expect(chunks.length).toBeGreaterThanOrEqual(1);
       expect(chunks.join(' ')).toContain('Test');
@@ -46,7 +46,9 @@ describe('Text Processing Integration', () => {
 
     it.skipIf(!hasAnthropicKey)('should work with Anthropic models', async () => {
       const text = 'Test sentence for splitting with Anthropic models and API integration.';
-      const chunks = await splitTextMaxTokens(text, 'anthropic/claude-sonnet-4-5', 10);
+      // count_tokens on Claude 5.x models includes ~10 tokens of fixed request overhead,
+      // so a single word already counts as ~10 tokens; use a slightly larger chunk size.
+      const chunks = await splitTextMaxTokens(text, 'anthropic/claude-sonnet-5-5', 20);
       
       expect(chunks.length).toBeGreaterThanOrEqual(1);
       expect(chunks.join(' ')).toContain('Test');
@@ -124,7 +126,7 @@ describe('Text Processing Integration', () => {
         { role: 'user' as const, content: 'What is the weather like today?' }
       ];
       
-      const trimmed = await trimMessages(messages, 'anthropic/claude-sonnet-4-5', 50);
+      const trimmed = await trimMessages(messages, 'anthropic/claude-sonnet-5-5', 50);
       expect(trimmed.length).toBeLessThanOrEqual(messages.length);
       expect(trimmed.length).toBeGreaterThan(0);
     });
@@ -135,7 +137,7 @@ describe('Text Processing Integration', () => {
         { role: 'assistant' as const, content: 'Hi' },
       ];
 
-      const trimmed = await trimMessages(simpleMessages, 'google/gemini-2.5-flash', 5);
+      const trimmed = await trimMessages(simpleMessages, 'google/gemini-3.8-flash', 5);
       expect(trimmed.length).toBeGreaterThanOrEqual(0);
     });
 

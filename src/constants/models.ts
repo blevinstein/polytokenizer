@@ -5,44 +5,66 @@
  * and supported capabilities. Update this file when providers add new models or change specifications.
  * 
  * Sources for model information:
- * - OpenAI: https://platform.openai.com/docs/models/
- * - Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
+ * - OpenAI: https://developers.openai.com/api/docs/models
+ * - Anthropic: https://platform.claude.com/docs/en/about-claude/models/overview
  * - Google Gemini: https://ai.google.dev/gemini-api/docs/models
  * - Vertex AI: https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings
  * - Vertex AI: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings-api
  */
 
 export const CONTEXT_LIMITS = {
-  // OpenAI GPT-5 series (current - recommended)
-  'openai/gpt-5.2': 400_000,      // Latest flagship model (January 2026)
-  'openai/gpt-5.1': 400_000,      // Previous GPT-5 version
-  'openai/gpt-5': 400_000,        // Released August 2025
-  'openai/gpt-5-mini': 400_000,   // Faster, cost-efficient
-  'openai/gpt-5-nano': 400_000,   // Most efficient GPT-5 variant
+  // OpenAI GPT-5.6 series (current)
+  'openai/gpt-5.6-sol': 1_050_000,    // Flagship GPT-5.6 model
+  'openai/gpt-5.6-terra': 1_050_000,  // Balances intelligence and cost
+  'openai/gpt-5.6-luna': 1_050_000,   // Cost-sensitive, high-volume workloads
+
+  // OpenAI GPT-5.5 / GPT-5.4 series
+  'openai/gpt-5.5': 1_050_000,
+  'openai/gpt-5.4': 1_050_000,
+  'openai/gpt-5.4-mini': 400_000,     // Max 272K input tokens
+
+  // OpenAI GPT-5 series (previous generation)
+  'openai/gpt-5.2': 400_000,      // Previous flagship model
+  'openai/gpt-5.1': 400_000,      // Deprecated - shutdown April 1, 2027
+  'openai/gpt-5': 400_000,        // Deprecated - shutdown December 11, 2026
+  'openai/gpt-5-mini': 400_000,   // Deprecated - shutdown December 11, 2026
+  'openai/gpt-5-nano': 400_000,   // Deprecated - shutdown December 11, 2026
 
   // OpenAI O-series reasoning models
-  'openai/o3': 200_000,
-  'openai/o1': 200_000,
-  'openai/o1-mini': 128_000,
+  'openai/o3': 200_000,           // Deprecated - shutdown December 11, 2026
+  'openai/o1': 200_000,           // Deprecated
 
-  // Anthropic - Claude 4.5 series (current)
-  'anthropic/claude-sonnet-4-5': 200_000,
+  // Anthropic - current models
+  'anthropic/claude-fable-5-1': 1_000_000,
+  'anthropic/claude-opus-5-5': 1_000_000,
+  'anthropic/claude-sonnet-5-5': 1_000_000,
   'anthropic/claude-haiku-4-5': 200_000,
+
+  // Anthropic - Claude 5 series (legacy)
+  'anthropic/claude-fable-5': 1_000_000,
+  'anthropic/claude-opus-5': 1_000_000,
+  'anthropic/claude-sonnet-5': 1_000_000,
+
+  // Anthropic - Claude 4.x series (legacy)
+  'anthropic/claude-opus-4-8': 1_000_000,
+  'anthropic/claude-opus-4-7': 1_000_000,
+  'anthropic/claude-opus-4-6': 1_000_000,
+  'anthropic/claude-sonnet-4-6': 1_000_000,
   'anthropic/claude-opus-4-5': 200_000,
+  'anthropic/claude-sonnet-4-5': 200_000,  // Deprecated - retires November 30, 2026
 
-  // Anthropic - Claude 4 series (legacy)
-  'anthropic/claude-opus-4-1': 200_000,
-  'anthropic/claude-sonnet-4-0': 200_000,
-  'anthropic/claude-opus-4-0': 200_000,
+  // Google Gemini 3 series (current)
+  'google/gemini-3.8-flash': 1_048_576,
+  'google/gemini-3.7-flash': 1_048_576,
+  'google/gemini-3.6-flash': 1_048_576,
+  'google/gemini-3.5-flash': 1_048_576,
+  'google/gemini-3.5-flash-lite': 1_048_576,
+  'google/gemini-3.1-flash-lite': 1_048_576,
 
-  // Anthropic - Claude 3 series (legacy)
-  'anthropic/claude-3-7-sonnet-latest': 200_000,
-  'anthropic/claude-3-5-haiku-latest': 200_000,
-
-  // Google Gemini 2.5 series (current)
-  'google/gemini-2.5-pro': 2_000_000,
-  'google/gemini-2.5-flash': 1_000_000,
-  'google/gemini-2.5-flash-lite': 1_000_000,
+  // Google Gemini 2.5 series (access limited to existing users)
+  'google/gemini-2.5-pro': 1_048_576,
+  'google/gemini-2.5-flash': 1_048_576,
+  'google/gemini-2.5-flash-lite': 1_048_576,
 } as const;
 
 export const EMBEDDING_MODELS = [

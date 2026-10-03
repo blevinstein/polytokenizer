@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { AnthropicProvider, SUPPORTED_MODELS } from '../../src/providers/anthropic.js';
-import { countTokens, configure } from '../../src/index.js';
+import { countTokens, configure, CONTEXT_LIMITS } from '../../src/index.js';
 
 describe('AnthropicProvider', () => {
   let provider: AnthropicProvider;
@@ -21,17 +21,23 @@ describe('AnthropicProvider', () => {
       it('should not provide embedding functionality', () => {
         expect('embed' in provider).toBe(false);
       });
+
+      it('should have a context limit for every supported model', () => {
+        for (const model of SUPPORTED_MODELS) {
+          expect(CONTEXT_LIMITS[`anthropic/${model}` as keyof typeof CONTEXT_LIMITS]).toBeGreaterThan(0);
+        }
+      });
     });
 
     describe('Tokenization Support', () => {
       it('should provide tokenizer for models', () => {
-        const tokenizer = provider.getTokenizer('claude-sonnet-4-5');
+        const tokenizer = provider.getTokenizer('claude-sonnet-5-5');
         expect(tokenizer).toBeDefined();
         expect(typeof tokenizer.count).toBe('function');
       });
 
       it.skipIf(!hasApiKey)('should provide async tokenization', async () => {
-        const tokenizer = provider.getTokenizer('claude-sonnet-4-5');
+        const tokenizer = provider.getTokenizer('claude-sonnet-5-5');
         const result = await tokenizer.count('Hello world');
         expect(typeof result).toBe('number');
         expect(result).toBeGreaterThan(0);
@@ -75,14 +81,14 @@ describe('AnthropicProvider', () => {
         const shortText = 'Hello';
         const longText = 'Hello world this is a longer sentence with more words and punctuation!';
         
-        const shortCount = await countTokens('anthropic/claude-sonnet-4-5', shortText);
-        const longCount = await countTokens('anthropic/claude-sonnet-4-5', longText);
+        const shortCount = await countTokens('anthropic/claude-sonnet-5-5', shortText);
+        const longCount = await countTokens('anthropic/claude-sonnet-5-5', longText);
         
         expect(longCount).toBeGreaterThan(shortCount);
       });
 
       it.skipIf(!hasApiKey)('should reject empty text for token counting', async () => {
-        await expect(countTokens('anthropic/claude-sonnet-4-5', '')).rejects.toThrow();
+        await expect(countTokens('anthropic/claude-sonnet-5-5', '')).rejects.toThrow();
       });
 
       it.skipIf(!hasApiKey)('should work with complex text', async () => {
@@ -95,14 +101,14 @@ describe('AnthropicProvider', () => {
           and various punctuation marks: "quotes", 'apostrophes', and dashes—like this.
         `;
         
-        const count = await countTokens('anthropic/claude-sonnet-4-5', complexText);
+        const count = await countTokens('anthropic/claude-sonnet-5-5', complexText);
         expect(count).toBeGreaterThan(20); // Should be significantly more than a few words
         expect(typeof count).toBe('number');
       });
 
       it.skipIf(!hasApiKey)('should reject invalid API keys', async () => {
         configure({ anthropic: { apiKey: 'sk-ant-invalid-key-test' } });
-        await expect(countTokens('anthropic/claude-sonnet-4-5', 'test')).rejects.toThrow();
+        await expect(countTokens('anthropic/claude-sonnet-5-5', 'test')).rejects.toThrow();
 
         // Restore valid key
         if (hasApiKey) {
@@ -110,10 +116,10 @@ describe('AnthropicProvider', () => {
         }
       });
 
-      it.skipIf(!hasApiKey)('should count tokens for claude-sonnet-4-5 model', async () => {
-        // This test replicates the production error:
+      it.skipIf(!hasApiKey)('should count tokens for claude-sonnet-5-5 model', async () => {
+        // This test replicates the production error (originally seen with claude-sonnet-4-5):
         // Failed to countTokens for model 'anthropic/claude-sonnet-4-5': Error: HTTP 401: Unauthorized
-        const count = await countTokens('anthropic/claude-sonnet-4-5', 'Hello world');
+        const count = await countTokens('anthropic/claude-sonnet-5-5', 'Hello world');
         expect(count).toBeGreaterThan(0);
         expect(typeof count).toBe('number');
       });
@@ -129,7 +135,7 @@ describe('AnthropicProvider', () => {
           const testText = baseText.repeat(currentMultiplier);
           
           try {
-            const count = await countTokens('anthropic/claude-sonnet-4-5', testText);
+            const count = await countTokens('anthropic/claude-sonnet-5-5', testText);
             expect(typeof count).toBe('number');
             expect(count).toBeGreaterThan(0);
             

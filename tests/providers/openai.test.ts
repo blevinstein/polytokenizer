@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { OpenAIProvider, EMBEDDING_MODELS, CHAT_MODELS } from '../../src/providers/openai.js';
-import { embedText, countTokens, configure } from '../../src/index.js';
+import { embedText, countTokens, configure, CONTEXT_LIMITS } from '../../src/index.js';
 
 describe('OpenAIProvider', () => {
   let provider: OpenAIProvider;
@@ -45,6 +45,20 @@ describe('OpenAIProvider', () => {
         
         const decoded = tokenizer.decode!(tokens);
         expect(decoded).toBe(text);
+      });
+
+      it('should use o200k_base for all supported chat models', () => {
+        const text = 'Hello world! Tokenization 테스트 🚀';
+        const o200kTokens = provider.getTokenizer('gpt-4o').encode!(text);
+        for (const model of CHAT_MODELS) {
+          expect(provider.getTokenizer(model).encode!(text)).toEqual(o200kTokens);
+        }
+      });
+
+      it('should have a context limit for every supported chat model', () => {
+        for (const model of CHAT_MODELS) {
+          expect(CONTEXT_LIMITS[`openai/${model}` as keyof typeof CONTEXT_LIMITS]).toBeGreaterThan(0);
+        }
       });
     });
 

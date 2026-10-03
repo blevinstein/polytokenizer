@@ -38,11 +38,11 @@ const embedding1536 = await embedText('google/gemini-embedding-001', 'Hello worl
 const embedding3072 = await embedText('google/gemini-embedding-001', 'Hello world', 3072); // default
 
 // Count tokens
-const tokens = await countTokens('anthropic/claude-sonnet-4-5', 'This is a test message');
+const tokens = await countTokens('anthropic/claude-sonnet-5-5', 'This is a test message');
 console.log(tokens); // 6
 
 // Split text to fit model context
-const chunks = await splitTextMaxTokens('openai/gpt-5', longText, 1000);
+const chunks = await splitTextMaxTokens('openai/gpt-5.6-sol', longText, 1000);
 console.log(chunks); // ['chunk1...', 'chunk2...']
 ```
 
@@ -203,9 +203,9 @@ const result768 = await embedText('google/gemini-embedding-001', 'Hello world', 
 Count tokens in text for the specified model.
 
 ```javascript
-const count = await countTokens('openai/gpt-5', 'Hello world');
-const count = await countTokens('anthropic/claude-sonnet-4-5', 'Hello world');
-const count = await countTokens('google/gemini-2.5-pro', 'Hello world');
+const count = await countTokens('openai/gpt-5.6-sol', 'Hello world');
+const count = await countTokens('anthropic/claude-sonnet-5-5', 'Hello world');
+const count = await countTokens('google/gemini-3.8-flash', 'Hello world');
 ```
 
 **Parameters:**
@@ -221,7 +221,7 @@ const count = await countTokens('google/gemini-2.5-pro', 'Hello world');
 Split text into chunks that fit within the specified token limit.
 
 ```javascript
-const chunks = await splitTextMaxTokens(longText, 'openai/gpt-5', 1000, {
+const chunks = await splitTextMaxTokens(longText, 'openai/gpt-5.6-sol', 1000, {
   preserveSentences: true,  // default: true
   preserveWords: true       // default: true
 });
@@ -253,7 +253,7 @@ const messages = [
   // ... more messages
 ];
 
-const trimmed = await trimMessages(messages, 'openai/gpt-5', 4000, {
+const trimmed = await trimMessages(messages, 'openai/gpt-5.6-sol', 4000, {
   strategy: 'early',           // 'early' | 'late'
   preserveSystem: true,        // default: true
   extraTokensPerMessage: 4,    // optional: tokens added per message (default: 4)
@@ -291,17 +291,26 @@ OpenAI models add extra tokens for chat formatting:
 
 **Official Documentation:** [OpenAI Models](https://platform.openai.com/docs/models) | [Changelog](https://platform.openai.com/docs/changelog)
 
-**GPT-5 Series (Current - o200k_base tokenizer):**
-- `openai/gpt-5.2` - Latest flagship model (400K context) - $1.25/MTok input
-- `openai/gpt-5.1` - Previous GPT-5 version (400K context)
-- `openai/gpt-5` - Released August 2025 (400K context)
-- `openai/gpt-5-mini` - Faster, cost-efficient (400K context) - $0.25/MTok input
-- `openai/gpt-5-nano` - Most efficient variant (400K context) - $0.05/MTok input
+**GPT-5.6 Series (Current - o200k_base tokenizer):**
+- `openai/gpt-5.6-sol` - Flagship GPT-5.6 model (1.05M context) - $4/MTok input
+- `openai/gpt-5.6-terra` - Balances intelligence and cost (1.05M context) - $2/MTok input
+- `openai/gpt-5.6-luna` - Cost-sensitive, high-volume workloads (1.05M context) - $0.20/MTok input
+
+**GPT-5.5 / GPT-5.4 Series (o200k_base tokenizer):**
+- `openai/gpt-5.5` - Coding and professional work (1.05M context) - $5/MTok input
+- `openai/gpt-5.4` - More affordable coding model (1.05M context) - $2.50/MTok input
+- `openai/gpt-5.4-mini` - Strongest mini model (400K context, 272K max input) - $0.75/MTok input
+
+**GPT-5 Series (Previous generation - o200k_base tokenizer):**
+- `openai/gpt-5.2` - Previous flagship model (400K context) - $1.75/MTok input
+- `openai/gpt-5.1` - **Deprecated**, shutdown April 1, 2027 (400K context) - $1.25/MTok input
+- `openai/gpt-5` - **Deprecated**, shutdown December 11, 2026 (400K context) - $1.25/MTok input
+- `openai/gpt-5-mini` - **Deprecated**, shutdown December 11, 2026 (400K context) - $0.25/MTok input
+- `openai/gpt-5-nano` - **Deprecated**, shutdown December 11, 2026 (400K context) - $0.05/MTok input
 
 **O-Series Reasoning Models (o200k_base tokenizer):**
-- `openai/o3` - O3 reasoning model (200K context)
-- `openai/o1` - O1 reasoning model (200K context)
-- `openai/o1-mini` - O1 mini (128K context)
+- `openai/o3` - **Deprecated**, shutdown December 11, 2026 (200K context)
+- `openai/o1` - **Deprecated** (200K context)
 
 **Embedding Models:**
 - `openai/text-embedding-3-small` - 1536 dimensions (8K context) - $0.02/MTok
@@ -310,21 +319,26 @@ OpenAI models add extra tokens for chat formatting:
 
 ### Anthropic Models
 
-**Official Documentation:** [Anthropic Models Overview](https://docs.anthropic.com/en/docs/about-claude/models/overview)
+**Official Documentation:** [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview) | [Model Deprecations](https://platform.claude.com/docs/en/about-claude/model-deprecations)
 
-**Claude 4.5 Series (Current):**
-- `anthropic/claude-opus-4-5` - Claude 4.5 Opus (200K context)
-- `anthropic/claude-sonnet-4-5` - Claude 4.5 Sonnet (200K context)
-- `anthropic/claude-haiku-4-5` - Claude 4.5 Haiku (200K context)
+**Current Models:**
+- `anthropic/claude-fable-5-1` - Claude Fable 5.1 (1M context)
+- `anthropic/claude-opus-5-5` - Claude Opus 5.5 (1M context)
+- `anthropic/claude-sonnet-5-5` - Claude Sonnet 5.5 (1M context)
+- `anthropic/claude-haiku-4-5` - Claude Haiku 4.5 (200K context)
 
-**Claude 4 Series (Legacy):**
-- `anthropic/claude-opus-4-1` - Claude 4.1 Opus (200K context)
-- `anthropic/claude-opus-4-0` - Claude 4 Opus (200K context)
-- `anthropic/claude-sonnet-4-0` - Claude 4 Sonnet (200K context)
+**Claude 5 Series (Legacy):**
+- `anthropic/claude-fable-5` - Claude Fable 5 (1M context)
+- `anthropic/claude-opus-5` - Claude Opus 5 (1M context)
+- `anthropic/claude-sonnet-5` - Claude Sonnet 5 (1M context)
 
-**Claude 3 Series (Legacy):**
-- `anthropic/claude-3-7-sonnet-latest` - Claude 3.7 Sonnet (200K context)
-- `anthropic/claude-3-5-haiku-latest` - Claude 3.5 Haiku (200K context)
+**Claude 4.x Series (Legacy):**
+- `anthropic/claude-opus-4-8` - Claude Opus 4.8 (1M context)
+- `anthropic/claude-opus-4-7` - Claude Opus 4.7 (1M context)
+- `anthropic/claude-opus-4-6` - Claude Opus 4.6 (1M context)
+- `anthropic/claude-sonnet-4-6` - Claude Sonnet 4.6 (1M context)
+- `anthropic/claude-opus-4-5` - Claude Opus 4.5 (200K context)
+- `anthropic/claude-sonnet-4-5` - Claude Sonnet 4.5 (200K context) - **Deprecated**, retires November 30, 2026
 
 *Note: Anthropic models support tokenization only (no embedding capabilities)*
 
@@ -334,8 +348,16 @@ OpenAI models add extra tokens for chat formatting:
 
 **Chat Models (Tokenization Support):**
 
-*Gemini 2.5 Series (Current):*
-- `google/gemini-2.5-pro` - Gemini 2.5 Pro (2M context)
+*Gemini 3 Series (Current):*
+- `google/gemini-3.8-flash` - Gemini 3.8 Flash (1M context)
+- `google/gemini-3.7-flash` - Gemini 3.7 Flash (1M context)
+- `google/gemini-3.6-flash` - Gemini 3.6 Flash (1M context)
+- `google/gemini-3.5-flash` - Gemini 3.5 Flash (1M context)
+- `google/gemini-3.5-flash-lite` - Gemini 3.5 Flash-Lite (1M context) - cost efficient
+- `google/gemini-3.1-flash-lite` - Gemini 3.1 Flash-Lite (1M context) - cost efficient
+
+*Gemini 2.5 Series (access limited to users who have used them before):*
+- `google/gemini-2.5-pro` - Gemini 2.5 Pro (1M context)
 - `google/gemini-2.5-flash` - Gemini 2.5 Flash (1M context)
 - `google/gemini-2.5-flash-lite` - Gemini 2.5 Flash Lite (1M context) - cost efficient
 
